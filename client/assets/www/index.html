@@ -16,6 +16,7 @@
      KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
+        http://www.elmundio.net/projects/verticalSlider/verticalSlider.js
 -->
 <html>
     <head>
@@ -26,30 +27,68 @@
         <link rel="stylesheet" href="css/jquery.mobile-1.2.0.min.css" />
         <link rel="stylesheet" href="css/jquery.mobile.structure-1.2.0.min.css" />
         <link rel="stylesheet" href="css/jquery.mobile.theme-1.2.0.min.css" />
+        <link href="css/verticalSlider.css" rel="stylesheet" type="text/css" />
         
-        <script src="js/jquery-1.8.2.js">
-        </script>
-        <script src="js/jquery.mobile-1.2.0.min.js">
-        </script>
+        <script src="js/jquery-1.8.2.js"></script>
+        <script src="js/jquery.mobile-1.2.0.min.js"></script>
+        <script src="js/verticalSlider.js"></script>
         <title>Hello World</title>
+
+
+        <script>
+            $( document ).ready( function() {
+                //$("#login").load("./header.html");
+                //$("#student_feedback").load("./header.html");
+                //$("#student_feedback").append("student_feedback.html");
+                //$("#student_feedback").append("footer.html");
+
+                //$("#slider").change(function(){
+                //    var slider_value = $(this).val();
+                //    $("#eContent_student_bulb_on").css("opacity", slider_value/100);
+                //});
+                //$(".ePage").each(function(index, value) {
+                //    alert($(this).attr('id') + ".html");
+                //    $(this).load("header.html");
+                    //$(this).append($(this).attr('id') + ".html");
+                    //$(this).append("footer.html");
+                //});
+            });
+        </script>
+
+
     </head>
     <body>
         <!-- Home -->
-        <div data-role="page" id="page1">
+        <div data-role="page" class="ePage" id="login">
             <div id="eHeader" data-theme="a" data-role="header" data-position="fixed">
                 <h3>
                     Header
                 </h3>
-            </div>
-            
-            <div id="eContent" data-role="content">
-            </div>
-            
-            <div id="eFooter" data-theme="a" data-role="footer" data-position="fixed">
-                <h3>
-                    Footer
-                </h3>
-            </div>
         </div>
+    </div>
+
+        <div data-role="page" class="ePage" id="student_feedback">
+            <div id="eHeader" data-theme="a" data-role="header" data-position="fixed">
+                <h3>
+                    Header
+                </h3>
+            </div>        </div>
+        
+        <div data-role="page" class="ePage" id="new_lecture">
+            <div id="eHeader" data-theme="a" data-role="header" data-position="fixed">
+                <h3>
+                    Header
+                </h3>
+            </div>        </div>
+        
+        <div data-role="page" class="ePage" id="watch_lecture">
+            <div id="eHeader" data-theme="a" data-role="header" data-position="fixed">
+                <h3>
+                    Header
+                </h3>
+            </div>        
+        </div>
+
+
     </body>
 </html>
