@@ -37,28 +37,21 @@
 
         <script>
             $( document ).ready( function() {
-                //$("#login").load("./header.html");
-                //$("#student_feedback").load("./header.html");
-                //$("#student_feedback").append("student_feedback.html");
-                //$("#student_feedback").append("footer.html");
-
-                //$("#slider").change(function(){
-                //    var slider_value = $(this).val();
-                //    $("#eContent_student_bulb_on").css("opacity", slider_value/100);
-                //});
-                //$(".ePage").each(function(index, value) {
-                //    alert($(this).attr('id') + ".html");
-                //    $(this).load("header.html");
-                    //$(this).append($(this).attr('id') + ".html");
-                    //$(this).append("footer.html");
-                //});
+                $.mobile.changePage( "#student_feedback", { transition: "slideup"} );
+                
+                $('[data-role=header],[data-role=footer]').fixedtoolbar({ tapToggle:false });
+                
+                $("#slider").change(function(){
+                    var slider_value = $(this).val();
+                    $("#eContent_student_bulb_on").css("opacity", slider_value/100);
+                });
             });
         </script>
 
 
     </head>
     <body>
-        <!-- Home -->
+        <!-- -------------------------------- LOGIN PAGE---------------------------------------- -->
         <div data-role="page" class="ePage" id="login">
             <div id="eHeader" data-theme="a" data-role="header" data-position="fixed">
                 <h3>
@@ -66,21 +59,40 @@
                 </h3>
         </div>
     </div>
-
+    
+        <!-- ----------------------------  Student Feedback ----------------------------- -->
         <div data-role="page" class="ePage" id="student_feedback">
             <div id="eHeader" data-theme="a" data-role="header" data-position="fixed">
                 <h3>
                     Header
                 </h3>
-            </div>        </div>
+            </div>
+                
+            <div id="eContent" data-role="content">
+                <div id="fader">
+                    <img id="eContent_student_bulb_off" src="img/base.png" style="position:absolute;top:0;left:0;" />
+                    <img id="eContent_student_bulb_on" src="img/bright.png" style="position:absolute;top:0;left:0;" />
+                </div>
+                <input id="slider" name="slider" type="range" min="0" max="100" value="25" step="5" sliderOrientation="verticalInverted" />
+            </div>
+
+            <div id="eFooter" data-theme="a" data-role="footer" data-position="fixed">
+                <h3>
+                    Footer
+                </h3>
+            </div>
+        </div>
         
+        <!-- -------------------------------- New Lecture PAGE---------------------------------------- -->
         <div data-role="page" class="ePage" id="new_lecture">
             <div id="eHeader" data-theme="a" data-role="header" data-position="fixed">
                 <h3>
                     Header
                 </h3>
-            </div>        </div>
+            </div>
+        </div>
         
+        <!-- -------------------------------- Watch Lecture PAGE---------------------------------------- -->
         <div data-role="page" class="ePage" id="watch_lecture">
             <div id="eHeader" data-theme="a" data-role="header" data-position="fixed">
                 <h3>
