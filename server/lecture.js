@@ -11,7 +11,16 @@ Lecture = function(port, host) {
 Lecture.prototype.usedLectureCodes = [];
 
 Lecture.prototype.createLectureCode = function(courseCode, callback) {
-	callback(null, null);
+	var lectureCode = "";
+	while (lectureCode.length < 8) {
+		lectureCode = Math.random().toString(36).substr(2);
+		lectureCode = lectureCode.substr(0, 8);
+		if (lectureCode in usedLectureCodes) {
+			lectureCode = ""
+		}
+	}
+	usedLectureCodes[courseCode].push(lectureCode);
+	callback(null, lectureCode);
 };
 
 exports.Lecture = Lecture
