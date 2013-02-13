@@ -1,11 +1,13 @@
 var express = require('express');
 var Lecturer = require('./lecturer').Lecturer;
+var Lecture = require('./lecture').Lecture;
 
 // set up the app server
 var app = express();
 app.set( "jsonp callback", true);
 
 var lecturer = new Lecturer(27017, "localhost");
+var lecture = new Lecture(27017, "localhost");
 
 // define configuration for express
 app.configure(function() {
@@ -37,8 +39,18 @@ app.get('/login', function(request, response) {
 	var lecturerUsername =  request.body["username"];
 	var lecturerPassword = request.body["password"];
 	lecturer.authenticate(lecturerUsername, lecturerPassword, function(authenticationError, result) {
-		if (authenticationError) this.loginRespondWithError(authenticationError, response);
+		if (authenticationError) this.respondWithError(authenticationError, response);
 		else this.respondWithSuccess(result, request, response);
+	});
+});
+
+app.get('/lecture/code', function(request, response) {
+	console.log("Lecturer requesting a lecture code...");
+	
+	var courseCode = request.body["courseCode"];
+	lecture.createLectureCode(courseCode, function(lectureCodeError, lectureCode){
+		if (lectureCodeError) this.respondWithError(lectureCodeError, response);
+		else this.respondWithSuccess(lectureCode, request, response);
 	});
 });
 
