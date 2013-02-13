@@ -54,5 +54,16 @@ app.get('/lecture/code', function(request, response) {
 	});
 });
 
+app.get('/lecture/join', function(request, response) {
+	console.log("Student joining a lecture....");
+	
+	var lectureCode = request.body["lectureCode"];
+	
+	lecture.joinLecture(lectureCode, function(joinLectureError, joinLectureResult){
+		if (joinLectureError) this.respondWithError(joinLectureError, response);
+		else this.respondWithSuccess(joinLectureResult, request, response);
+	});
+});
+
 app.listen(7001);
 console.log("Engage server listening on port 7001");
