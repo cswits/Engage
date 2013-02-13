@@ -17,16 +17,16 @@ Lecture.prototype.createLectureCode = function(courseCode, callback) {
 	while (lectureCode.length < 8) {
 		lectureCode = Math.random().toString(36).substr(2);
 		lectureCode = lectureCode.substr(0, 8);
-		if (lectureCode in usedLectureCodes[courseCode]) {
+		if (lectureCode in this.usedLectureCodes[courseCode]) {
 			lectureCode = "";
 		}
 	}
-	usedLectureCodes[courseCode].push(lectureCode);
+	this.usedLectureCodes[courseCode].push(lectureCode);
 	callback(null, lectureCode);
 };
 
 Lecture.prototype.joinLecture = function(lectureCode, callback) {
-	if (lectureCode in currentLectureCodes) {
+	if (lectureCode in this.currentLectureCodes) {
 		var today = new Date();
 		var todayYear = today.getFullYear();
 		var todayDate = today.getDate();
@@ -41,4 +41,4 @@ Lecture.prototype.joinLecture = function(lectureCode, callback) {
 	}
 };
 
-exports.Lecture = Lecture
+exports.Lecture = Lecture;

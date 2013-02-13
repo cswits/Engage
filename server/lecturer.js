@@ -44,4 +44,4 @@ Lecturer.prototype.authenticate = function(username, password, callback) {
 	}
 };
 
-exports.Lecturer = Lecturer
+exports.Lecturer = Lecturer;
