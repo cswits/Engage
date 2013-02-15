@@ -147,6 +147,7 @@ Lecture.prototype.endLecture = function(lectureCode, callback) {
 				callback(wrongLectureCodeError, null);
 			} else {
 				this.currentLectureCodes = [];
+				// Need to delete the lecturecode from currentDeviceIds
 				var lectureDevicesIndex = this.currentDeviceIds.indexOf(validatedLectureCode);
 				if (lectureDevicesIndex != -1) this.currentDeviceIds.splice(lectureDevicesIndex, 1);
 				var endLectureResult = {
@@ -199,6 +200,21 @@ Lecture.prototype.leaveLecture = function(lectureCode, deviceId, callback) {
 					};
 					callback(null, leaveResult);
 				}
+			}
+		}
+	});
+};
+
+Lecture.prototype.refreshAverageUnderstandingLevel = function(lectureCode, callback) {
+	this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode){
+		if (lectureCodeValidationError) callback(lectureCodeValidationError, null);
+		else {
+			var allLectureDevices = this.currentDeviceIds[validatedLectureCode];
+			if (!allLectureDevices) {
+				var wrongLectureCodeError = new Error("Lecture code " + validatedLectureCode + " does not exist");
+				callback(wrongLectureCodeError, null);
+			} else {
+				async.forEach(...);
 			}
 		}
 	});

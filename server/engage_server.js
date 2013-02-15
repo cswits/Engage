@@ -134,5 +134,17 @@ app.get('/users/delete/:username', function(request, response) {
 	});
 });
 
+app.get('/understanding/refresh/:lectureCode', function(request, response) {
+	console.log("Refreshing the average understanding graph...");
+	
+	var lectureCode = request.params["lectureCode"];
+	
+	lecture.refreshAverageUnderstandingLevel(lectureCode, function(error, result){
+		if (error) this.respondWithError(error, response);
+		else this.respondWithSuccess(result, request, response);
+	});
+	
+});
+
 app.listen(7001);
 console.log("Engage server listening on port 7001");
