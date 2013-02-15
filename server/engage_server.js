@@ -37,7 +37,7 @@ respondWithSuccess = function(result, request, response) {
 // routes
 
 // lecturer logging into the system
-app.get('/login', function(request, response) {
+app.get('/users/login', function(request, response) {
 	console.log("Lecturer login to Engage ...");
 	var lecturerUsername =  request.body["username"];
 	var lecturerPassword = request.body["password"];
@@ -105,6 +105,21 @@ app.get('/understanding/add', function(request, response) {
 	lecture.submitUnderstandingLevel(lectureCode, deviceId, understanding_level, function(understandingError, understandingResult) {
 		if (understandingError) this.respondWithError(understandingError, response);
 		else this.respondWithSuccess(understandingResult, request, response);
+	});
+});
+
+app.get('/users/create', function(request, response) {
+	console.log("Creating a lecturer in the db ...");
+	
+	var username = request.body["username"];
+	var password = request.body["password"];
+	var lastname = request.body["lastname"];
+	var firstname = request.body["firstname"];
+	var title = request.body["title"];
+	
+	lecturer.create(username, password, lastname, firstname, title, function(createError, createResult) {
+		if (createError) this.respondWithError(createError, response);
+		else this.respondWithSuccess(createResult, request, response);
 	});
 });
 
