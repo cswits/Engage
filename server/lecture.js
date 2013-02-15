@@ -23,7 +23,7 @@ Lecture = function(port, host) {
 Lecture.prototype.usedLectureCodes = {};
 
 // Array keeping track of all device Ids
-Lecture.prototype.currentDeviceIds = [];
+Lecture.prototype.currentDeviceIds = {};
 
 // Array keeping all the current lecture codes
 Lecture.prototype.currentLectureCodes = [];
@@ -74,7 +74,7 @@ Lecture.prototype.joinLecture = function(lectureCode, deviceID, callback){
 				var wrongLectureCodeError = new Error("Lecture code does not exist");
 				callback(wrongLectureCodeError, null);
 			} else {
-				this.currentDeviceIds[lectureCode].push(validationResult["deviceID"]);
+				this.currentDeviceIds[validationResult["lectureCode"]].push(validationResult["deviceID"]);
 				var lectureResult = {
 					lectureCode: validationResult["lectureCode"],
 					time: new Date().toTimeString()
