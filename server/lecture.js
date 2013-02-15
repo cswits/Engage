@@ -111,24 +111,29 @@ Lecture.prototype.submitUnderstandingLevel = function(lectureCode, deviceId, tim
 		if (validationError) callback(validationError, null);
 		else {
 			var now = new Date().toTimeString();
-			var understandingData = new UnderstandingData(validationResult["understandingLevel"], now);
-			var lectureData = this.understandingLevels[validationResult["lectureCode"]];
-			if (!lectureData) {
-				var lectureDataError = new Error("Lecture code does not exist!");
-				callback(lectureDataError, null);
-			} else {
-				var deviceData = lectureData[validationResult["deviceID"]];
-				if (!deviceData) {
-					var deviceDataError = new Error("Device Id does not exist!");
-					callback(deviceDataError, null);
-				} else {
-					deviceData.push(understandingData);
-					var submitDataResult = {
-						result: "Success!"
-					};
-					callback(null, submitDataResult);
+			var understandingData = new UnderstandingData();
+			undertandingData.setValue(validationResult["understandingLevel"], now, function(levelError, levelResult) {
+				if (levelError) callback(levelError, null);
+				else {
+					var lectureData = this.understandingLevels[validationResult["lectureCode"]];
+					if (!lectureData) {
+						var wrongLectureCodeError = new Error("Lecture code " + validationResult["lectureCode"] + " does not exist");
+						callback(null, wrongLectureCodeError, null);
+					} else {
+						var deviceData = lectureData[validationResult["deviceID"]];
+						if (!deviceData) {
+							var wrongDeviceIDError = new Error("Device ID " + validationResult["deviceID"] + " does not exist");
+							callback(wrongDeviceIDError, null);
+						} else {
+							deviceData.push(understandingData);
+							var submitResult = {
+								result: "Success!"
+							};
+							callback(null, submitResult);
+						}
+					}
 				}
-			}
+			});
 		}
 	});
 };
