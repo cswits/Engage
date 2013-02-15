@@ -123,5 +123,16 @@ app.get('/users/create', function(request, response) {
 	});
 });
 
+app.get('/users/delete/:username', function(request, response) {
+	console.log("Deleting user " + request.params["username"] + ' ...');
+	
+	var username = request.params["username"];
+	
+	lecturer.delete(username, function(deleteError, deleteResult) {
+		if (deleteError) this.respondWithError(deleteError, response);
+		else this.respondWithSuccess(deleteResult, request, response);
+	});
+});
+
 app.listen(7001);
 console.log("Engage server listening on port 7001");

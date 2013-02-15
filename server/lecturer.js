@@ -1,5 +1,4 @@
 // lecturer.js
-
 var bcrypt = require("bcrypt");
 var async = require('async');
 
@@ -7,52 +6,75 @@ var async = require('async');
 var dbUrl = "engageDB";
 var db = require('mongojs').connect(dbUrl);
 
+// loading other objects
+var Validator = require('./validator').Validator;
+var validator = new Validator();
+
 Lecturer = function(port, host) {
 	console.log("Creating a Lecturer object with database on port " + port + " and host " + host);
 };
 
 Lecturer.prototype.authenticate = function(username, password, callback) {
+	var validateUserForAuthentication = {
+		username: function(usernamePartialCallback) {
+			this.validateUsername(username, function(usernameValidationError, validatedUsername) {
+				if (validationError) usernamePartialCallback(usernameValidationError, null);
+				else usernamePartialCallback(null, validatedUsername);
+			});
+		},
+		password: function(passwordPartialCallback) {
+			this.simpleValidation(password, "Password Missing!", function(passwordValidationError, validatedPassword) {
+				if (passwordValidationError) passwordPartialCallback(passwordValidationError, null);
+				else passwordPartialCallback(null, validatedPassword);
+			});
+		}
+	};
 	
-	
-	
-	if (!username) {
-		var usernameError = new Error("Error in lecturer login -- Missing username!");
-		callback(usernameError, null);
-	} else {
-		if (!password) {
-			var passwordError = new Error("Error in lecturer login -- Missing password!");
-			callback(passwordError, null);
-		} else {
-			db.lecturers.find({username: username}, function(dbError, lecturers) {
+	async.parallel(validateUserForAuthentication, function(validationError, validationResult) {
+		if (validationError) callback(validationError, null);
+		else {
+			db.lecturers.find({username: validationResult["username"]}, function(dbError, lecturers) {
 				if (dbError) callback(dbError, null);
 				else {
 					if ((!lecturers) || (lecturers.length == 0)) {
-						var lecturerCountError = new Error("Error in lecturer login -- There should be exactly one lecture with username " + username);
+						var lecturerCountError = new Error("There are no lecturer with username " + validationResult["username"]);
 						callback(lecturerCountError, null);
 					} else {
 						var singleLecturer = lecturers[0];
-						var hashedPassword = singleLecturer.password;
-						bcrypt.compare(password, hashedPassword, function(passwordError, result) {
+						var hashedPassword = singleLecturer["password"];
+						bcrypt.compare(validationResult["password"], hashedPassword, function(passwordError, result) {
 							if (passwordError) callback(passwordError, null);
 							else {
 								if (result) {
-									var authenticationError = new Error("Lecturer authentication failed. The username and password do not correspond");
+									var authenticationError = new Error("Lecturer authentication failed. The username and password do not correspond!");
 									callback(authenticationError, null);
 								} else {
-									callback(null, "Lecturer authentication successful!");
+									var authenticationResult = {
+										result: "success!"
+									};
+									callback(null, authenticationResult);
 								}
 							}
 						});
 					}
 				}
-			})	
+			});
 		}
-	}
+	});
+};
+
+Lecturer.prototype.delete = function(username, callback) {
+	this.validateUsername(username, function(usernameValidationError, validatedUsername) {
+		if (usernameValidationError) callback(usernameValidationError, null);
+		else {
+			// delete from db and return result
+		}
+	});
 };
 
 Lecturer.prototype.create = function(username, password, lastname, firstname, title, callback) {
 	// create the validation object
-	validateUserForCreation = {
+	var validateUserForCreation = {
 		username: function(usernamePartialCallback) {
 			this.validateUsername(username, function(usernameValidationError, validatedUsername) {
 				if (usernameValidationError) usernamePartialCallback(usernameValidationError, null);
@@ -160,10 +182,10 @@ Lecturer.prototype.validateTitle = function(title, callback) {
 };
 
 Lecturer.prototype.simpleValidation = function(value, errorMessage, callback) {
-	if ((!value) || (value.length == 0)) {
-		var missingValueError = new Error(errorMessage);
-		callback(missingValueError, null);
-	} else callback (null, value)
+	validator.validate(value, errorMessage, function(validationError, validationResult) {
+		if (validationError) callback(validationError, null);
+		else callback(null, validationResult);
+	});
 };
 
 exports.Lecturer = Lecturer;
