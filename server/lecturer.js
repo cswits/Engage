@@ -1,3 +1,5 @@
+// lecturer.js
+
 var bcrypt = require("bcrypt");
 
 // set up the database

@@ -1,3 +1,5 @@
+// engage_server.js
+
 var express = require('express');
 var Lecturer = require('./lecturer').Lecturer;
 var Lecture = require('./lecture').Lecture;
@@ -34,6 +36,7 @@ respondWithSuccess = function(result, request, response) {
 
 // routes
 
+// lecturer logging into the system
 app.get('/login', function(request, response) {
 	console.log("Lecturer login to Engage ...");
 	var lecturerUsername =  request.body["username"];
@@ -44,24 +47,64 @@ app.get('/login', function(request, response) {
 	});
 });
 
-app.get('/lecture/code', function(request, response) {
+// lecturer creating a new lecture code
+app.get('/lecture/code/new', function(request, response) {
 	console.log("Lecturer requesting a lecture code...");
 	
 	var courseCode = request.body["courseCode"];
-	lecture.createLectureCode(courseCode, function(lectureCodeError, lectureCode){
+	lecture.getNewLectureCode(courseCode, function(lectureCodeError, lectureCode){
 		if (lectureCodeError) this.respondWithError(lectureCodeError, response);
 		else this.respondWithSuccess(lectureCode, request, response);
 	});
 });
 
+// student joining a lecture
 app.get('/lecture/join', function(request, response) {
 	console.log("Student joining a lecture....");
 	
 	var lectureCode = request.body["lectureCode"];
+	var deviceId = request.body["deviceId"];
 	
-	lecture.joinLecture(lectureCode, function(joinLectureError, joinLectureResult){
+	lecture.joinLecture(lectureCode, deviceId, function(joinLectureError, joinLectureResult){
 		if (joinLectureError) this.respondWithError(joinLectureError, response);
 		else this.respondWithSuccess(joinLectureResult, request, response);
+	});
+});
+
+
+// lecturer ending a lecture
+app.get('/lecture/end', function(request, response) {
+	console.log("Ending lecture...");
+	
+	var lectureCode = request.body["lectureCode"];
+	lecture.endLecture(lectureCode, function(endLectureError, endLectureResult) {
+		if (endLectureError) this.respondWithError(endLectureError, response);
+		else this.respondWithSuccess(endLectureResult, request, response);
+	});
+});
+
+app.get('/lecture/leave', function(request, response) {
+	console.log("Student leaving lecture");
+	
+	var lectureCode = request.body["lectureCode"];
+	var deviceId = request.body["deviceId"];
+	
+	lecture.leaveLecture(lectureCode, deviceId, function(leaveLectureError, leaveLectureResult) {
+		if (leaveLectureError) this.respondWithError(leaveLectureError, response);
+		else this.respondWithSuccess(leaveLectureResult, request, response);
+	});
+});
+
+app.get('/understanding/add', function(request, response) {
+	console.log("Student submitting current understanding level");
+	
+	var lectureCode = request.body["lectureCode"];
+	var deviceId = request.body["deviceId"];
+	var understanding_level = request.body["understanding"];
+	
+	lecture.submitUnderstandingLevel(lectureCode, deviceId, understanding_level, function(understandingError, understandingResult) {
+		if (understandingError) this.respondWithError(understandingError, response);
+		else this.respondWithSuccess(understandingResult, request, response);
 	});
 });
 
