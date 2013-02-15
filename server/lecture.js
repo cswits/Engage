@@ -33,16 +33,16 @@ Lecture.prototype.currentLectureCodes = [];
 Lecture.prototype.understandingLevels = {};
 
 Lecture.prototype.getNewLectureCode = function(courseCode, callback) {
-	this.validateCourseCode(courseCode, function(validationError, validationResult) {
+	this.validateCourseCode(courseCode, function(validationError, validatedCourseCode) {
 		if (validationError) callback(validationError, null);
 		else {
 			var lectureCode = "";
 			while(lectureCode.length < 8) {
 				lectureCode = Math.random().toString(36).substr(2);
 				lectureCode = lectureCode.substr(0,8);
-				if (this.usedLectureCodes.indexOf(lectureCode) != -1) lectureCode = "";
+				if (this.usedLectureCodes.indexOf(validatedCourseCode) != -1) lectureCode = "";
 			}
-			this.usedLectureCodes[validationResult].push(lectureCode);
+			this.usedLectureCodes[validatedCourseCode].push(lectureCode);
 			var newLectureCodeResult  = {
 				lectureCode: lectureCode
 			};
