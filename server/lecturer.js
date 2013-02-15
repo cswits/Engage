@@ -46,4 +46,8 @@ Lecturer.prototype.authenticate = function(username, password, callback) {
 	}
 };
 
+Lecturer.prototype.create = function(username, password, lastname, firstname, title, callback) {
+	
+};
+
 exports.Lecturer = Lecturer;

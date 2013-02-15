@@ -119,6 +119,12 @@ Lecture.prototype.leaveLecture = function(lectureCode, deviceId, callback) {
 					callback(unknownDeviceIdError, null);
 				} else {
 					allLectureDevices.splice(deviceIndex, 1);
+					if (allLectureDevices.length == 0) {
+						curIndex = this.currentDeviceIds.indexOf(lectureCode);
+						if (curIndex != -1) {
+							this.currentDeviceIds.splice(curIndex, 1);
+						}
+					}
 					var leaveResult = {
 						result: "Success!"
 					};
