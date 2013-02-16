@@ -1,17 +1,11 @@
-
-Validator = function() {};
-
-Validator.prototype.validate = function(value, errorMessage, callback) {
-	if ((!value) || (value.length == 0)) {
-		var missingValueError = new Error(errorMessage);
-		callback(missingValueError, null);
-	} else callback(null, value);
-};
-
-
-if ((!value) || (value.length == 0)) {
-	var missingValueError = new Error(errorMessage);
-	callback(missingValueError, null);
-} else callback (null, value)
-
-exports.Validator = Validator;
+exports.Validator = (function(){
+	function Validator() {
+		Validator.prototype.validate = function(value, errorMessage, callback) {
+			if ((!value) || ((typeof value == "string") && (value.length == 0))) {
+				var missingValueError = new Error(errorMessage);
+				callback(errorMessage, null);
+			} else callback(null, value);
+		};
+	}
+	return Validator;
+})();
