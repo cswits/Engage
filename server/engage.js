@@ -8,7 +8,6 @@ var Lecture = require('./lecture').Lecture;
 var app = express();
 app.set( "jsonp callback", true);
 
-var lecturer = new Lecturer(27017, "localhost");
 var lecture = new Lecture(27017, "localhost");
 
 // define configuration for express
@@ -21,79 +20,7 @@ app.configure(function() {
 // routes
 
 require('./routes/lecturer-routes')(app);
-
-// lecturer creating a new lecture code
-app.get('/lecture/code/new', function(request, response) {
-	console.log("Lecturer requesting a lecture code...");
-	
-	var courseCode = request.body["courseCode"];
-	lecture.getNewLectureCode(courseCode, function(lectureCodeError, lectureCode){
-		if (lectureCodeError) this.respondWithError(lectureCodeError, response);
-		else this.respondWithSuccess(lectureCode, request, response);
-	});
-});
-
-// student joining a lecture
-app.get('/lecture/join', function(request, response) {
-	console.log("Student joining a lecture....");
-	
-	var lectureCode = request.body["lectureCode"];
-	var deviceId = request.body["deviceId"];
-	
-	lecture.joinLecture(lectureCode, deviceId, function(joinLectureError, joinLectureResult){
-		if (joinLectureError) this.respondWithError(joinLectureError, response);
-		else this.respondWithSuccess(joinLectureResult, request, response);
-	});
-});
-
-
-// lecturer ending a lecture
-app.get('/lecture/end', function(request, response) {
-	console.log("Ending lecture...");
-	
-	var lectureCode = request.body["lectureCode"];
-	lecture.endLecture(lectureCode, function(endLectureError, endLectureResult) {
-		if (endLectureError) this.respondWithError(endLectureError, response);
-		else this.respondWithSuccess(endLectureResult, request, response);
-	});
-});
-
-app.get('/lecture/leave', function(request, response) {
-	console.log("Student leaving lecture");
-	
-	var lectureCode = request.body["lectureCode"];
-	var deviceId = request.body["deviceId"];
-	
-	lecture.leaveLecture(lectureCode, deviceId, function(leaveLectureError, leaveLectureResult) {
-		if (leaveLectureError) this.respondWithError(leaveLectureError, response);
-		else this.respondWithSuccess(leaveLectureResult, request, response);
-	});
-});
-
-app.get('/understanding/add', function(request, response) {
-	console.log("Student submitting current understanding level");
-	
-	var lectureCode = request.body["lectureCode"];
-	var deviceId = request.body["deviceId"];
-	var understanding_level = request.body["understanding"];
-	
-	lecture.submitUnderstandingLevel(lectureCode, deviceId, understanding_level, function(understandingError, understandingResult) {
-		if (understandingError) this.respondWithError(understandingError, response);
-		else this.respondWithSuccess(understandingResult, request, response);
-	});
-});
-
-app.get('/understanding/refresh/:lectureCode', function(request, response) {
-	console.log("Refreshing the average understanding graph...");
-	
-	var lectureCode = request.params["lectureCode"];
-	
-	lecture.refreshAverageUnderstandingLevel(lectureCode, function(error, result){
-		if (error) this.respondWithError(error, response);
-		else this.respondWithSuccess(result, request, response);
-	});
-	
-});
+require('./routes/lecture-routes')(app);
 
 app.listen(7001);
 console.log("Engage server listening on port 7001");

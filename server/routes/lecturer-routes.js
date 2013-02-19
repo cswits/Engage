@@ -1,6 +1,4 @@
 // requiring packages
-var Lecturer = require('./lecturer').Lecturer;
-var lecturer = new Lecturer();
 var LecturerController = requires('../lib/controllers/lecturer-controller').LecturerController;
 
 module.exports = function(app) {

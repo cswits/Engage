@@ -3,10 +3,11 @@ var ResponseHandler = require('../handlers/response-handler').ResponseHandler;
 
 exports.LecturerController = (function() {
 	function LecturerController() {
-		this.prototype.lecturer = new Lecturer();
+		this.prototype.lecturer = new Lecturer(27017, "localhost");
+		
 		this.prototype.responseHandler = new ResponseHandler();
 		
-		Lecturer.prototype.authenticateLecturer = function(request, response) {
+		LecturerController.prototype.authenticateLecturer = function(request, response) {
 			console.log("Lecturer logging into the system...");
 			
 			var lecturerUsername = request.body["username"];
@@ -16,7 +17,7 @@ exports.LecturerController = (function() {
 			});
 		};
 		
-		Lecturer.prototype.createLecturer = function(request, response) {
+		LecturerController.prototype.createLecturer = function(request, response) {
 			console.log("Creating a new lecturer into the system...");
 			
 			var username = request.body["username"];
@@ -30,7 +31,7 @@ exports.LecturerController = (function() {
 			});
 		};
 		
-		Lecturer.prototype.deleteLecturer = function(request, response) {
+		LecturerController.prototype.deleteLecturer = function(request, response) {
 			console.log("Deleting an existing lecturer from the system...");
 			
 			var username = request.params["username"];
