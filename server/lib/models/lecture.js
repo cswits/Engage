@@ -2,8 +2,9 @@
 
 var async = require('async');
 var mongo = require('mongojs');
-var Validator = require('./validator').Validator;
-var UnderstandingData = require('./understanding-data').UnderstandingData;
+var Validator = require('../handlers/validator').Validator;
+var DataHandler = require('../handlers/data-handler').DataHandler;
+var UnderstandingData = require('../handlers/understanding-data').UnderstandingData;
 
 
 exports.Lecture = (function(){
