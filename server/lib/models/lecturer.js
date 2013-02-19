@@ -1,17 +1,14 @@
 // lecturer.js
 var bcrypt = require("bcrypt");
 var async = require('async');
-var mongo = require('mongojs');
-var Validator = require('./validator').Validator;
+var Validator = require('../handlers/validator').Validator;
+var DataHandler = require('../handlers/data-handler').DataHandler;
 
 exports.Lecturer = (function(){
-	function Lecturer(port, host) {
-		console.log("Creating a Lecturer object with database on port %d and host %s", port, host);
+	function Lecturer() {
 		this.validator = new Validator();
-		this.port = port;
-		this.host = host;
-		this.dbUrl = "engageDB";
-		this.db = mongo.connect(this.dbUrl);
+		// make the data handler a singleton
+		
 		
 		Lecturer.prototype.authenticate = function(username, password, callback) {
 			var validateUserForAuthentication = {
@@ -124,22 +121,21 @@ exports.Lecturer = (function(){
 			async.parallel(validatedUserForCreation, function(validationError, validationResult) {
 				if (validationError) callback(validationError, null);
 				else {
-					// first check if there is a lecturer in the database with a 
-					// username
-					this.db.lecturers.find({username: validationResult["username"]}, function(dbError, lecturers) {
-						if (dbError) callback(dbError, null);
+					this.dataHandler.findData("lecturers", {username: validationResult["username"]}, function(findError, lecturers) {
+						if (findError) callback(findError, null);
 						else {
 							if ((lecturers) && (lecturers.length >= 1)) {
 								var lecturerAlreadyExistsError = new Error("There already exists a lecturer with username %s", validationResult["username"]);
 								callback(lecturerAlreadyExistsError, null);
 							} else {
-								this.db.lecturers.save(validationResult, function(createError, createResult) {
-									if (createError) callback(createError, null);
+								this.dataHandler.saveData("lecturers", validationResult, function(saveError, saveResult) {
+									if (saveError) callback(saveError, null);
 									else {
-										if (!createResult) {
-											var lecturerCreationFailedError = new Error("Lecturer creation failed!");
+										if (!saveResult) {
+											var lecturerCreationFailedError = new Error("Error creating a lecturer with username %s", validationResult["username"]);
 											callback(lecturerCreationFailedError, null);
-										} else callback(null, createResult);
+										}
+										else callback(null, saveResult);
 									}
 								});
 							}

@@ -18,36 +18,9 @@ app.configure(function() {
         app.use(app.router);
 });
 
-// responding to http requests
-
-respondWithError = function(error, response) {
-	var errorMessage = error.message;
-	response.writeHead(404, {"Content-Type": "text/plain"});
-	response.end(errorMessage);
-};
-
-respondWithSuccess = function(result, request, response) {
-	response.header("Access-Control-Allow-Origin", "*");
-	response.header("Access-Control-Allow-Headers", "X-Requested-With");
-	response.header("Content-type", "application/json");
-	response.header('Charset', 'utf8');
-	response.send(request.query.callback + '(' + JSON.stringify(result) + ')');
-};
-
 // routes
 
 require('./routes/lecturer-routes')(app);
-
-// lecturer logging into the system
-app.get('/users/login', function(request, response) {
-	console.log("Lecturer login to Engage ...");
-	var lecturerUsername =  request.body["username"];
-	var lecturerPassword = request.body["password"];
-	lecturer.authenticate(lecturerUsername, lecturerPassword, function(authenticationError, result) {
-		if (authenticationError) this.respondWithError(authenticationError, response);
-		else this.respondWithSuccess(result, request, response);
-	});
-});
 
 // lecturer creating a new lecture code
 app.get('/lecture/code/new', function(request, response) {
@@ -109,32 +82,6 @@ app.get('/understanding/add', function(request, response) {
 		else this.respondWithSuccess(understandingResult, request, response);
 	});
 });
-
-// app.get('/users/create', function(request, response) {
-// 	console.log("Creating a lecturer in the db ...");
-// 	
-// 	var username = request.body["username"];
-// 	var password = request.body["password"];
-// 	var lastname = request.body["lastname"];
-// 	var firstname = request.body["firstname"];
-// 	var title = request.body["title"];
-// 	
-// 	lecturer.create(username, password, lastname, firstname, title, function(createError, createResult) {
-// 		if (createError) this.respondWithError(createError, response);
-// 		else this.respondWithSuccess(createResult, request, response);
-// 	});
-// });
-// 
-// app.get('/users/delete/:username', function(request, response) {
-// 	console.log("Deleting user " + request.params["username"] + ' ...');
-// 	
-// 	var username = request.params["username"];
-// 	
-// 	lecturer.delete(username, function(deleteError, deleteResult) {
-// 		if (deleteError) this.respondWithError(deleteError, response);
-// 		else this.respondWithSuccess(deleteResult, request, response);
-// 	});
-// });
 
 app.get('/understanding/refresh/:lectureCode', function(request, response) {
 	console.log("Refreshing the average understanding graph...");

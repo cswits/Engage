@@ -1,19 +1,19 @@
 // requiring packages
 var Lecturer = require('./lecturer').Lecturer;
 var lecturer = new Lecturer();
-var LecturerController = requires('')
+var LecturerController = requires('../lib/controllers/lecturer-controller').LecturerController;
 
 module.exports = function(app) {
 	app.get('/lecturers/login', function(request, response) {
-		// to be continued
+		new LecturerController().authenticateLecturer(request, response);
 	});
 	
 	app.get('/lecturers/create', function(request, response) {
-		// to be defined
+		new LecturerController().createLecturer(request, response);
 	});
 	
 	app.get('/lecturers/delete/:username', function(request, response) {
-		// deleting a lecurer from the database
+		new LecturerController().deleteLecturer(request, response);
 	});
 }
 
