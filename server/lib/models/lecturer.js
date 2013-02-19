@@ -11,7 +11,6 @@ exports.Lecturer = (function(){
 		// make the data handler a singleton
 		this.dataHandler = new DataHandler(port, host);
 		
-		
 		Lecturer.prototype.authenticate = function(username, password, callback) {
 			var validateUserForAuthentication = {
 				username: function(usernamePartialCallback) {
@@ -50,7 +49,12 @@ exports.Lecturer = (function(){
 											if (!compareResult) {
 												var authenticationError = new Error("Authenticaton failed for lecturer %s. The username and password do not correspond!", validationResult["username"]);
 												callback(authenticationError, null);
-											} else callback(null, authenticationResult);
+											} else {
+												var authenticationResult = {
+													result: "Success!"
+												};
+												callback(null, authenticationResult);
+											}
 										}
 									});
 								}
@@ -65,15 +69,15 @@ exports.Lecturer = (function(){
 			this.validateUsername(username, function(usernameValidationError, validatedUsername) {
 				if (usernameValidationError) callback(usernameValidationError, null);
 				else {
-					this.db.lecturers.remove({username: validatedUsername}, function(dbError, dbResult) {
-						if (dbError) callback(dbError, null);
+					this.dataHandler.deleteData("lecturers", {username: validatedUsername}, function(deleteError, deleteResult) {
+						if (deleteError) callback(deleteError, null);
 						else {
-							if (!dbResult) {
-								var failedUserDeletionError = new Error("User %s deletion failed!", validatedUsername);
+							if (!deleteResult) {
+								var failedUserDeletionError = new Error("Error deleting user %s", validatedUsername);
 								callback(failedUserDeletionError, null);
 							} else {
 								var deletionResult = {
-									result: "success!"
+									result: "Success!"
 								};
 								callback(null, deletionResult);
 							}
