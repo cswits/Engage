@@ -36,6 +36,8 @@ respondWithSuccess = function(result, request, response) {
 
 // routes
 
+require('./routes/lecturer-routes')(app);
+
 // lecturer logging into the system
 app.get('/users/login', function(request, response) {
 	console.log("Lecturer login to Engage ...");
@@ -108,31 +110,31 @@ app.get('/understanding/add', function(request, response) {
 	});
 });
 
-app.get('/users/create', function(request, response) {
-	console.log("Creating a lecturer in the db ...");
-	
-	var username = request.body["username"];
-	var password = request.body["password"];
-	var lastname = request.body["lastname"];
-	var firstname = request.body["firstname"];
-	var title = request.body["title"];
-	
-	lecturer.create(username, password, lastname, firstname, title, function(createError, createResult) {
-		if (createError) this.respondWithError(createError, response);
-		else this.respondWithSuccess(createResult, request, response);
-	});
-});
-
-app.get('/users/delete/:username', function(request, response) {
-	console.log("Deleting user " + request.params["username"] + ' ...');
-	
-	var username = request.params["username"];
-	
-	lecturer.delete(username, function(deleteError, deleteResult) {
-		if (deleteError) this.respondWithError(deleteError, response);
-		else this.respondWithSuccess(deleteResult, request, response);
-	});
-});
+// app.get('/users/create', function(request, response) {
+// 	console.log("Creating a lecturer in the db ...");
+// 	
+// 	var username = request.body["username"];
+// 	var password = request.body["password"];
+// 	var lastname = request.body["lastname"];
+// 	var firstname = request.body["firstname"];
+// 	var title = request.body["title"];
+// 	
+// 	lecturer.create(username, password, lastname, firstname, title, function(createError, createResult) {
+// 		if (createError) this.respondWithError(createError, response);
+// 		else this.respondWithSuccess(createResult, request, response);
+// 	});
+// });
+// 
+// app.get('/users/delete/:username', function(request, response) {
+// 	console.log("Deleting user " + request.params["username"] + ' ...');
+// 	
+// 	var username = request.params["username"];
+// 	
+// 	lecturer.delete(username, function(deleteError, deleteResult) {
+// 		if (deleteError) this.respondWithError(deleteError, response);
+// 		else this.respondWithSuccess(deleteResult, request, response);
+// 	});
+// });
 
 app.get('/understanding/refresh/:lectureCode', function(request, response) {
 	console.log("Refreshing the average understanding graph...");
