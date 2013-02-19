@@ -140,7 +140,12 @@ exports.Lecturer = (function(){
 											var lecturerCreationFailedError = new Error("Error creating a lecturer with username %s", validationResult["username"]);
 											callback(lecturerCreationFailedError, null);
 										}
-										else callback(null, saveResult);
+										else {
+											var finalSaveResult = {
+												result: "Success!"
+											};
+										}
+										callback(null, finalSaveResult);
 									}
 								});
 							}
