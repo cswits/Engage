@@ -5,9 +5,11 @@ var Validator = require('../handlers/validator').Validator;
 var DataHandler = require('../handlers/data-handler').DataHandler;
 
 exports.Lecturer = (function(){
-	function Lecturer() {
+	function Lecturer(port, host) {
 		this.validator = new Validator();
+		
 		// make the data handler a singleton
+		this.dataHandler = new DataHandler(port, host);
 		
 		
 		Lecturer.prototype.authenticate = function(username, password, callback) {
@@ -25,39 +27,38 @@ exports.Lecturer = (function(){
 					});
 				}
 			};
-
+			
 			async.parallel(validateUserForAuthentication, function(validationError, validationResult) {
 				if (validationError) callback(validationError, null);
 				else {
-					this.db.lecturers.find({username: validationResult["username"]}, function(dbError, lecturers) {
-						if (dbError) callback(dbError, null);
+					this.dataHandler.findData("lecturers", {username: validationResult["username"]}, function(findError, findResult) {
+						if (findError) callback(findError, null);
 						else {
 							if ((!lecturers) || (lecturers.length == 0)) {
-								var lecturerCountError = new Error("There are no lecturer with username %s", validationResult["username"]);
-								callback(lecturerCountError, null);
+								var undefinedLecturerError = new Error("There is no lecturer with username %s", validationResult["username"]);
+								callback(undefinedLecturerError, null);
 							} else {
-								// there should be only lecturer with such username
-								var singleLecturer = lecturers[0];
-								var hashedPassword = singleLecturer["password"];
-								bcrypt.compare(validationResult["password"], hashedPassword, function(passwordError, result) {
-									if (passwordError) callback(passwordError, null);
-									else {
-										if (result) {
-											var authenticationError = new Error("Lecturer authentication failed for %s. The username and password do not correspond!", validationResult["username"]);
-											callback(authenticationError, null);
-										} else {
-											var authenticationResult = {
-												result: "success!"
-											};
-											callback(null, authenticationResult);
+								if (lecturers.length != 1) {
+									var lecturerCountError = new Error("There should be exactly one lecturer with username %s", validationResult["username"]);
+									callback(lecturerCountError, null);
+								} else {
+									var singleLecturer = lecturers[0];
+									var hashedPassword = singleLecturer["password"];
+									bcrypt.compare(validationResult["password"], hashedPassword, function(compareError, compareResult) {
+										if (compareError) callback(compareError, null);
+										else {
+											if (!compareResult) {
+												var authenticationError = new Error("Authenticaton failed for lecturer %s. The username and password do not correspond!", validationResult["username"]);
+												callback(authenticationError, null);
+											} else callback(null, authenticationResult);
 										}
-									}
-								});
+									});
+								}
 							}
 						}
 					});
 				}
-			});
+			});			
 		};
 
 		Lecturer.prototype.delete = function(username, callback) {
