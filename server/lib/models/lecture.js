@@ -9,12 +9,16 @@ var UnderstandingData = require('../handlers/understanding-data').UnderstandingD
 
 exports.Lecture = (function(){
 	function Lecture(port, host) {
-		console.log("Creating a Lecture object with database on port %d and host %s", port, host);
 		this.validator = new Validator();
-		this.port = port;
-		this.host = host;
-		this.dbUrl = "engageDB";
-		this.db = mongo.connect(this.dbUrl);
+		this.dataHandler = DataHandler.getInstance(port, host);
+		
+		// console.log("Creating a Lecture object with database on port %d and host %s", port, host);
+		// 		this.validator = new Validator();
+		// 		this.port = port;
+		// 		this.host = host;
+		// 		this.dbUrl = "engageDB";
+		// 		this.db = mongo.connect(this.dbUrl);
+		
 		// Associative array keeping track of the lecture codes already generated for a given course
 		this.usedLectureCodes = {};
 
