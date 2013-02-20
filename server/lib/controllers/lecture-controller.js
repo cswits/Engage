@@ -4,8 +4,7 @@ var ResponseHandler = require('../handlers/response-handler').ResponseHandler;
 exports.LectureController = (function(){
 	function LectureController() {
 		this.prototype.lecture = new Lecture(27017, "localhost");
-		
-		this.prototype.responseHandler = new ResponseHandler();
+		this.prototype.responseHandler = ResponseHandler.getInstance();
 		
 		LectureController.prototype.createLectureCode = function(request, response) {
 			console.log("Generating a new lecture code for course...");

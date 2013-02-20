@@ -4,8 +4,7 @@ var ResponseHandler = require('../handlers/response-handler').ResponseHandler;
 exports.LecturerController = (function() {
 	function LecturerController() {
 		this.prototype.lecturer = new Lecturer(27017, "localhost");
-		
-		this.prototype.responseHandler = new ResponseHandler();
+		this.prototype.responseHandler = ResponseHandler.getInstance();
 		
 		LecturerController.prototype.authenticateLecturer = function(request, response) {
 			console.log("Lecturer logging into the system...");
