@@ -6,7 +6,7 @@ var DataHandler = require('../handlers/data-handler').DataHandler;
 
 exports.Lecturer = (function(){
 	function Lecturer(port, host) {
-		this.validator = new Validator();
+		this.validator = Validator.getInstance();
 		this.dataHandler = DataHandler.getInstance(port, host);
 		
 		Lecturer.prototype.authenticate = function(username, password, callback) {

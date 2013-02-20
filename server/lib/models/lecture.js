@@ -8,7 +8,7 @@ var UnderstandingData = require('../handlers/understanding-data').UnderstandingD
 
 exports.Lecture = (function(){
 	function Lecture(port, host) {
-		this.validator = new Validator();
+		this.validator = Validator.getInstance();
 		this.dataHandler = DataHandler.getInstance(port, host);
 		
 		// generate new lecture code
