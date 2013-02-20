@@ -52,7 +52,7 @@ exports.LectureController = (function(){
 			
 			var lectureCode = request.body["lectureCode"];
 			var deviceId = request.body["deviceId"];
-			var understandingLevel = request.body["understanding"];
+			var understandingLevel = request.body["understandingLevel"];
 			
 			this.lecture.submitUnderstandingLevel(lectureCode, deviceId, understandingLevel, function(understandingError, understandingResult){
 				this.responseHandler.handleResponse(understandingError, understandingResult, request, response);

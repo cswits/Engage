@@ -10,19 +10,6 @@ exports.Lecture = (function(){
 	function Lecture(port, host) {
 		this.validator = new Validator();
 		this.dataHandler = DataHandler.getInstance(port, host);
-				
-		// Associative array keeping track of the lecture codes already generated for a given course
-		// this.usedLectureCodes = {};
-
-		// Array keeping track of all device Ids
-		this.currentDeviceIds = {};
-
-		// Array keeping all the current lecture codes
-		this.currentLectureCodes = [];
-
-		// understanding levels as an associative array
-		// for each lecture code there is an associative array that stores all the submissions
-		this.understandingLevels = {};
 		
 		// generate new lecture code
 		Lecture.prototype.getNewLectureCode = function(courseCode, callback) {
@@ -109,7 +96,7 @@ exports.Lecture = (function(){
 			});
 		};
 		
-		Lecture.prototype.submitUnderstandingLevel = function(lectureCode, deviceId, timestamp, callback) {
+		Lecture.prototype.submitUnderstandingLevel = function(lectureCode, deviceID, understandingLevel, callback) {
 			var validateForUnderstanding = {
 				lectureCode: function(lectureCodePartialCallback) {
 					this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode) {
@@ -118,46 +105,33 @@ exports.Lecture = (function(){
 					});
 				},
 				deviceID: function(deviceIDPartialCallback) {
-					this.validateDeviceId(deviceId, function(deviceIDValidationError, validatedDeviceId){
+					this.validateDeviceId(deviceID, function(deviceIDValidationError, validatedDeviceId) {
 						if (deviceIDValidationError) deviceIDPartialCallback(deviceIDValidationError, null);
-						else deviceIDPartialCallback(null, validatedDeviceId);
+						else deviceIDPartialCallback(null, validatedDeviveId);
 					});
 				},
 				understandingLevel: function(understandingLevelPartialCallback) {
-					this.validateUnderstandingLevel(understandingLevel, function(understandingLevelValidationError, validatedUnderstandingLevel){
+					this.validateUnderstandingLevel(understandingLevel, function(understandingLevelValidationError, validatedUnderstandingLevel) {
 						if (understandingLevelValidationError) understandingLevelPartialCallback(understandingLevelValidationError, null);
 						else understandingLevelPartialCallback(null, validatedUnderstandingLevel);
 					});
-				} 
+				}
 			};
-
+			
 			async.parallel(validateForUnderstanding, function(validationError, validationResult) {
 				if (validationError) callback(validationError, null);
 				else {
 					var now = new Date().toTimeString();
 					var understandingData = new UnderstandingData(validationResult["understandingLevel"], now);
-
-					var lectureData = this.understandingLevels[validationResult["lectureCode"]];
-					if (!lectureData) {
-						var wrongLectureCodeError = new Error("Lecture code " + validationResult["lectureCode"] + " does not exist");
-						callback(null, wrongLectureCodeError, null);
-					} else {
-						var deviceData = lectureData[validationResult["deviceID"]];
-						if (!deviceData) {
-							var wrongDeviceIDError = new Error("Device ID " + validationResult["deviceID"] + " does not exist");
-							callback(wrongDeviceIDError, null);
-						} else {
-							deviceData.push(understandingData);
-							var submitResult = {
-								result: "Success!"
-							};
-							callback(null, submitResult);
-						}
-					}
+					
+					this.dataHandler.addUnderstandingLevel(validationResult["lectureCode"], validationResult["deviceID"], understandingData, function(understandingError, understandingResult) {
+						if (understandingError) callback(understandingError, null);
+						else callback(null, understandingResult);
+					});
 				}
 			});
 		};
-		
+				
 		Lecture.prototype.refreshAverageUnderstandingLevel = function(lectureCode, callback) {
 			this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode){
 				if (lectureCodeValidationError) callback(lectureCodeValidationError, null);

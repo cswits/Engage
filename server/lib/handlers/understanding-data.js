@@ -3,12 +3,12 @@ exports.UnderstandingData = (function(){
 		this.level = level;
 		this.timestamp = ts;
 		
-		UnderstandingData.prototype.getLevel = function(callback) {
-			callback(null, this.level);
+		UnderstandingData.prototype.getLevel = function() {
+			return this.level;
 		};
 		
-		UnderstandingData.prototype.getTimestamp = function(callback) {
-			callback(null, this.timestamp);
+		UnderstandingData.prototype.getTimestamp = function() {
+			return this.timestamp;
 		};
 		
 	}

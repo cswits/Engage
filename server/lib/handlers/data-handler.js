@@ -30,6 +30,13 @@ exports.DataHandler = (function() {
 		// value: [device Ids]
 		var currentDeviceIds = {};
 		
+		// understanding levels as an associative array
+		// key: lecture code
+		// value: another associative array with
+		// key: deviceId
+		// value: [understanding levels]
+		var understandingLevels = {};
+		
 		return {
 			findData: function(bucketName, criteria, callback) {
 				db[bucketName].find(criteria, function(findError, findResult) {
@@ -106,6 +113,41 @@ exports.DataHandler = (function() {
 					}
 				}
 			},
+			addUnderstandingLevel: function(lectureCode, deviceId, understandingData, callback) {
+				var lectureData = understandingLevels[lectureCode];
+				if (!lectureData) {
+					var wrongLectureCodeError = new Error("Lecture code %s unknown for understanding levels", lectureCode);
+					callback(wrongLectureCodeError, null);
+				} else {
+					var deviceData = lectureData[deviceID];
+					if (!deviceData) {
+						var wrongDeviceIDError = new Error("Devicd ID %s unknown for understanding levels", deviceId);
+						callback(wrongDeviceIDError, null);
+					} else {
+						deviceData.push(undertandingData);
+						var understandingRecord = {
+							lectureCode: lectureCode,
+							deviceId: deviceId,
+							timestamp: understandingData.getTimestamp(),
+							undertandingLevel: understandingData.getLevel()
+						};
+						saveData("understandings", understandingRecord, function(error, result){
+							if (error) callback(error, null);
+							else {
+								if (!result) {
+									var saveFailedError = new Error("Saving understanding level failed");
+									callback(saveFailedError, null);
+								} else {
+									var addResult = {
+										result: "Success!"
+									};
+									callback(null, addResult);
+								}
+							}
+						});
+					}
+				}
+			}
 		}
 	}
 })();
