@@ -70,68 +70,44 @@ exports.Lecture = (function(){
 			});
 		};
 		
-		Lecture.prototype.endLecture = function(lectureCode, callback) {};
-		
 		Lecture.prototype.endLecture = function(lectureCode, callback) {
-			this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode) {
+			this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode){
 				if (lectureCodeValidationError) callback(lectureCodeValidationError, null);
 				else {
-					if (this.currentLectureCodes.indexOf(validatedLectureCode) == -1) {
-						var wrongLectureCodeError =  new Error("Lecture code does not exist");
-						callback(wrongLectureCodeError, null);
-					} else {
-						this.currentLectureCodes = [];
-						delete this.currentDeviceIds[validatedLectureCode];
-						var endLectureResult = {
-							result: "Success!"
-						};
-						callback(null, endLectureResult);
-					}
+					this.dataHandler.endLecture(validatedLectureCode, function(endLectureError, endLectureResult) {
+						if (endLectureError) callback(endLectureError, null);
+						else callback(null, endLectureResult);
+					});
 				}
 			});
 		};
-
-		Lecture.prototype.leaveLecture = function(lectureCode, deviceId, callback) {
+		
+		Lecture.prototype.leaveLecture = function(lectureCode, deviceID, callbacl) {
 			var validateForLeaveLecture = {
 				lectureCode: function(lectureCodePartialCallback) {
-					this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode) {
+					this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode){
 						if (lectureCodeValidationError) lectureCodePartialCallback(lectureCodeValidationError, null);
 						else lectureCodePartialCallback(null, validatedLectureCode);
 					});
 				},
-				deviceID: function(deviceIDPartialCallback) {
-					this.validateDeviceId(deviceId, function(deviceIDValidationError, validatedDeviceID){
+				devideID: function(deviceIDPartialCallback) {
+					this.validateDeviceId(deviceID, function(deviceIDValidationError, validatedDeviceID){
 						if (deviceIDValidationError) deviceIDPartialCallback(deviceIDValidationError, null);
 						else deviceIDPartialCallback(null, validatedDeviceID);
 					});
 				}
 			};
-
+			
 			async.parallel(validateForLeaveLecture, function(validationError, validationResult) {
 				if (validationError) callback(validationError, null);
 				else {
-					var allLectureDevices = this.currentDeviceIds[validationResult["lectureCode"]];
-					if (!allLectureDevices) {
-						var unknownLectureCodeError = new Error("Lecture code unknown!");
-						callback(unknownLectureCodeError, null);
-					} else {
-						var deviceIndex = allLectureDevices.indexOf(validationResult["deviceID"]);
-						if (deviceIndex == -1) {
-							var unknownDeviceError = new Error("Device Unknown!");
-							callback(unknownDeviceError, null);
-						} else {
-							allLectureDevices.splice(deviceIndex, 1);
-							delete this.currentDeviceIds[validationResult["lectureCode"]];
-							var leaveResult = {
-								result: "Success!"
-							};
-							callback(null, leaveResult);
-						}
-					}
+					this.dataHandler.unmapLectureCodeFromStudent(validationResult["lectureCode"], validationResult["deviceID"], function(leaveError, leaveResult) {
+						if (leaveError) callback(leaveError, null);
+						else callback(null, leaveResult);
+					});
 				}
 			});
 		};
-		
 		
 		Lecture.prototype.submitUnderstandingLevel = function(lectureCode, deviceId, timestamp, callback) {
 			var validateForUnderstanding = {

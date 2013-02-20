@@ -72,7 +72,40 @@ exports.DataHandler = (function() {
 					};
 					callback(null, result);
 				}
-			}
+			},
+			endLecture: function(lectureCode, callback) {
+				if (currentLectureCodes.indexOf(lectureCode) == -1) {
+					var wrongLectureCodeError = new Error("Lecture code does not exist");
+					callback(wrongLectureCodeError, null);
+				} else {
+					currentLectureCodes = [];
+					delete currentDeviceIds[lectureCode];
+					var endLectureResult = {
+						result: "Success!"
+					};
+					callback(null, endLectureResult);
+				}
+			},
+			unmapLectureCodeFromStudent: function(lectureCode, deviceId, callback) {
+				var allLectureDevices = currentDeviceIds[lectureCode];
+				if (!allLectureDevices) {
+					var unknownLectureCodeError = new Error("Lecture code unknown!");
+					callback(unknownLectureCodeError, null);
+				} else {
+					var deviceIndex = allLectureDevices.indexOf(deviceId);
+					if (deviceIndex == -1) {
+						var unknownDeviceError = new Error("Device unknown!");
+						callback(unknownDeviceError, null);
+					} else {
+						allLectureDevices.splice(deviceIndex, 1);
+						if (allLectureDevices.length == 0) delete currentDeviceIds[lectureCode];
+						var leaveResult = {
+							result: "Success!"
+						};
+						callback(null, leaveResult);
+					}
+				}
+			},
 		}
 	}
 })();
