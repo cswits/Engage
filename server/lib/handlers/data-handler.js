@@ -66,7 +66,9 @@ exports.DataHandler = (function() {
 				});
 			},
 			deleteData: function(bucketName, key, callback){
-				// to be added
+				db[bucketName].remove(key, function(removeError, removeResult) {
+					callback(removeError, removeResult);
+				});
 			},
 			generateNewLectureCode: function(courseCode, callback) {
 				var lectureCode = "";
