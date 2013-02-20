@@ -36,6 +36,16 @@ exports.LectureController = (function(){
 				this.responseHandler.handleResponse(endLectureError, endLectureResult, request, response);
 			});
 		};
+		
+		LectureController.prototype.leaveLecture = function(request, response) {
+			console.log("Student leaving lecture...");
+			
+			var lectureCode = request.body["lectureCode"];
+			var deviceId = request.body["deviceId"];
+			this.lecture.leaveLecture(lectureCode, deviceId, function(leaveLectureError, leaveLectureResult){
+				this.responseHandler.handleResponse(leaveLectureError, leaveLectureResult, request, respponse);
+			});
+		};
 	}
 	return LectureController;
 })();

@@ -16,19 +16,12 @@ module.exports = function(app) {
 	app.get('/lecture/end', function(request, response){
 		new LectureController().endLecture(request, response);
 	});
-}
-
-app.get('/lecture/leave', function(request, response) {
-	console.log("Student leaving lecture");
 	
-	var lectureCode = request.body["lectureCode"];
-	var deviceId = request.body["deviceId"];
-	
-	lecture.leaveLecture(lectureCode, deviceId, function(leaveLectureError, leaveLectureResult) {
-		if (leaveLectureError) this.respondWithError(leaveLectureError, response);
-		else this.respondWithSuccess(leaveLectureResult, request, response);
+	// student leaving a lecture
+	app.get('/lecture/leave', function(request, response) {
+		new LectureController().leaveLecture(request, response);
 	});
-});
+}
 
 app.get('/understanding/add', function(request, response) {
 	console.log("Student submitting current understanding level");
