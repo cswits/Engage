@@ -31,6 +31,7 @@ exports.LectureController = (function(){
 			console.log("Lecturer ending a lecture...");
 			
 			var lectureCode = request.body["lectureCode"];
+			
 			this.lecture.endLecture(lectureCode, function(endLectureError, endLectureResult){
 				this.responseHandler.handleResponse(endLectureError, endLectureResult, request, response);
 			});
