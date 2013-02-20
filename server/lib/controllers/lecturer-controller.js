@@ -39,7 +39,6 @@ exports.LecturerController = (function() {
 				this.responseHandler.handleResponse(deleteError, deleteResult, request, response);
 			});
 		};
-		
 	}
 	return LecturerController;
 })();

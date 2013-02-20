@@ -2,7 +2,7 @@ exports.ResponseHandler = (function() {
 	function ResponseHandler() {
 		ResponseHandler.prototype.handleResponse = function(error, result, request, response) {
 			if (error) this.respondWithError(error, response);
-			else respondWithSuccess(result, request, response);
+			else this.respondWithSuccess(result, request, response);
 		};
 		
 		ResponseHandler.prototype.respondWithError = function(error, response) {
