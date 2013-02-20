@@ -26,16 +26,10 @@ module.exports = function(app) {
 	app.get('/lecture/understanding/add', function(request, response){
 		new LectureController().submitUnderstandingLevel(request, response);
 	});
-}
-
-app.get('/understanding/refresh/:lectureCode', function(request, response) {
-	console.log("Refreshing the average understanding graph...");
 	
-	var lectureCode = request.params["lectureCode"];
-	
-	lecture.refreshAverageUnderstandingLevel(lectureCode, function(error, result){
-		if (error) this.respondWithError(error, response);
-		else this.respondWithSuccess(result, request, response);
+	// refreshing average understanding level for lecturer
+	// this might simply be handled with websocket or socket.io
+	app.get('/lecture/understanding/refresh/:lectureCode', function(request, response) {
+		console.log("To be determined");
 	});
-	
-});
+}
