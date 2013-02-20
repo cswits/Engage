@@ -65,8 +65,8 @@ exports.DataHandler = (function() {
 					callback(saveError, saveResult);
 				});
 			},
-			deleteData: function(bucketName, key, callback){
-				db[bucketName].remove(key, function(removeError, removeResult) {
+			deleteData: function(bucketName, criteria, callback){
+				db[bucketName].remove(criteria, function(removeError, removeResult) {
 					callback(removeError, removeResult);
 				});
 			},
