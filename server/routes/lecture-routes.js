@@ -21,20 +21,12 @@ module.exports = function(app) {
 	app.get('/lecture/leave', function(request, response) {
 		new LectureController().leaveLecture(request, response);
 	});
-}
-
-app.get('/understanding/add', function(request, response) {
-	console.log("Student submitting current understanding level");
 	
-	var lectureCode = request.body["lectureCode"];
-	var deviceId = request.body["deviceId"];
-	var understanding_level = request.body["understanding"];
-	
-	lecture.submitUnderstandingLevel(lectureCode, deviceId, understanding_level, function(understandingError, understandingResult) {
-		if (understandingError) this.respondWithError(understandingError, response);
-		else this.respondWithSuccess(understandingResult, request, response);
+	// student submitting their current level of understanding
+	app.get('/lecture/understanding/add', function(request, response){
+		new LectureController().submitUnderstandingLevel(request, response);
 	});
-});
+}
 
 app.get('/understanding/refresh/:lectureCode', function(request, response) {
 	console.log("Refreshing the average understanding graph...");

@@ -46,6 +46,18 @@ exports.LectureController = (function(){
 				this.responseHandler.handleResponse(leaveLectureError, leaveLectureResult, request, respponse);
 			});
 		};
+		
+		LectureController.prototype.submitUnderstandingLevel = function(request, response) {
+			console.log("Student submitting their current level of understanding...");
+			
+			var lectureCode = request.body["lectureCode"];
+			var deviceId = request.body["deviceId"];
+			var understandingLevel = request.body["understanding"];
+			
+			this.lecture.submitUnderstandingLevel(lectureCode, deviceId, understandingLevel, function(understandingError, understandingResult){
+				this.responseHandler.handleResponse(understandingError, understandingResult, request, response);
+			});
+		};
 	}
 	return LectureController;
 })();
