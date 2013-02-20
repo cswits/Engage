@@ -131,7 +131,8 @@ exports.Lecture = (function(){
 				}
 			});
 		};
-				
+		
+		// 	this method is still pending...
 		Lecture.prototype.refreshAverageUnderstandingLevel = function(lectureCode, callback) {
 			this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode){
 				if (lectureCodeValidationError) callback(lectureCodeValidationError, null);

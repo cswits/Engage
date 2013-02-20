@@ -38,6 +38,23 @@ exports.DataHandler = (function() {
 		var understandingLevels = {};
 		
 		return {
+			findLecturers: function(lecturerUsername, callback) {
+				var criteria = {username: lecturerUsername};
+				findData("lecturers", criteria, function(findError, findResult) {
+					callback(findError, findResult);
+				});
+			},
+			addLecturer: function(data, callback) {
+				saveData("lecturers", data, function(addError, addResult) {
+					callback(addError, addResult);
+				});
+			},
+			deleteLecturer: function(lecturerUsername, callback) {
+				var criteria = {username: lecturerUsername};
+				deleteData("lecturers", criteria, function(deleteError, deleteResult){
+					callback(deleteError, deleteResult);
+				});
+			},
 			findData: function(bucketName, criteria, callback) {
 				db[bucketName].find(criteria, function(findError, findResult) {
 					callback(findError, findResult);
@@ -47,6 +64,9 @@ exports.DataHandler = (function() {
 				db[bucketName].save(data, function(saveError, saveResult){
 					callback(saveError, saveResult);
 				});
+			},
+			deleteData: function(bucketName, key, callback){
+				// to be added
 			},
 			generateNewLectureCode: function(courseCode, callback) {
 				var lectureCode = "";

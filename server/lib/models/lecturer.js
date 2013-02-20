@@ -28,7 +28,7 @@ exports.Lecturer = (function(){
 			async.parallel(validateUserForAuthentication, function(validationError, validationResult) {
 				if (validationError) callback(validationError, null);
 				else {
-					this.dataHandler.findData("lecturers", {username: validationResult["username"]}, function(findError, findResult) {
+					this.dataHandler.findLecturers(validationResult["username"], function(findError, findResult) {
 						if (findError) callback(findError, null);
 						else {
 							if ((!lecturers) || (lecturers.length == 0)) {
@@ -67,7 +67,7 @@ exports.Lecturer = (function(){
 			this.validateUsername(username, function(usernameValidationError, validatedUsername) {
 				if (usernameValidationError) callback(usernameValidationError, null);
 				else {
-					this.dataHandler.deleteData("lecturers", {username: validatedUsername}, function(deleteError, deleteResult) {
+					this.dataHandler.deleteLecturer(validatedUsername, function(deleteError, deleteResult) {
 						if (deleteError) callback(deleteError, null);
 						else {
 							if (!deleteResult) {
@@ -124,14 +124,14 @@ exports.Lecturer = (function(){
 			async.parallel(validatedUserForCreation, function(validationError, validationResult) {
 				if (validationError) callback(validationError, null);
 				else {
-					this.dataHandler.findData("lecturers", {username: validationResult["username"]}, function(findError, lecturers) {
+					this.dataHandler.findLecturers(validationResult["username"], function(findError, lecturers) {
 						if (findError) callback(findError, null);
 						else {
 							if ((lecturers) && (lecturers.length >= 1)) {
 								var lecturerAlreadyExistsError = new Error("There already exists a lecturer with username %s", validationResult["username"]);
 								callback(lecturerAlreadyExistsError, null);
 							} else {
-								this.dataHandler.saveData("lecturers", validationResult, function(saveError, saveResult) {
+								this.dataHandler.addLecturer(validationResult, function(saveError, saveResult) {
 									if (saveError) callback(saveError, null);
 									else {
 										if (!saveResult) {
