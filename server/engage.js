@@ -1,8 +1,5 @@
 // engage_server.js
-
 var express = require('express');
-var Lecturer = require('./lecturer').Lecturer;
-var Lecture = require('./lecture').Lecture;
 
 // set up the app server
 var app = express();

@@ -1,7 +1,6 @@
 // lecture.js
 
 var async = require('async');
-var mongo = require('mongojs');
 var Validator = require('../handlers/validator').Validator;
 var DataHandler = require('../handlers/data-handler').DataHandler;
 var UnderstandingData = require('../handlers/understanding-data').UnderstandingData;
@@ -11,16 +10,9 @@ exports.Lecture = (function(){
 	function Lecture(port, host) {
 		this.validator = new Validator();
 		this.dataHandler = DataHandler.getInstance(port, host);
-		
-		// console.log("Creating a Lecture object with database on port %d and host %s", port, host);
-		// 		this.validator = new Validator();
-		// 		this.port = port;
-		// 		this.host = host;
-		// 		this.dbUrl = "engageDB";
-		// 		this.db = mongo.connect(this.dbUrl);
-		
+				
 		// Associative array keeping track of the lecture codes already generated for a given course
-		this.usedLectureCodes = {};
+		// this.usedLectureCodes = {};
 
 		// Array keeping track of all device Ids
 		this.currentDeviceIds = {};
@@ -32,108 +24,54 @@ exports.Lecture = (function(){
 		// for each lecture code there is an associative array that stores all the submissions
 		this.understandingLevels = {};
 		
+		// generate new lecture code
 		Lecture.prototype.getNewLectureCode = function(courseCode, callback) {
 			this.validateCourseCode(courseCode, function(validationError, validatedCourseCode) {
 				if (validationError) callback(validationError, null);
 				else {
-					var lectureCode = "";
-					while(lectureCode.length < 8) {
-						lectureCode = Math.random().toString(36).substr(2);
-						lectureCode = lectureCode.substr(0,8);
-						if (this.usedLectureCodes.indexOf(validatedCourseCode) != -1) lectureCode = "";
-					}
-					this.usedLectureCodes[validatedCourseCode].push(lectureCode);
-					var newLectureCodeResult  = {
-						lectureCode: lectureCode
-					};
-					callback(null, newLectureCodeResult);
+					this.dataHandler.generateNewLectureCode(validatedCourseCode, function(lectureCodeError, lectureCodeResult){
+						if (lectureCodeError) callback(lectureCodeError, null);
+						else {
+							var newLectureCodeResult = {
+								lectureCode: lectureCodeResult
+							};
+							callback(null, newLectureCodeResult);
+						}
+					});
 				}
 			});
 		};
-
-		Lecture.prototype.joinLecture = function(lectureCode, deviceID, callback){
+		
+		// joining a lecture
+		Lecture.prototype.joinLecture = function(lectureCode, deviceID, callback) {
 			var validateForJoinLecture = {
 				deviceID: function(deviceIDPartialCallback) {
-					this.validateDeviceId(deviceID, function(deviceIDValidationError, validatedDeviceID) {
+					this.validateDeviceId(deviceID, function(deviceIDValidationError, validatedDeviceID){
 						if (deviceIDValidationError) deviceIDPartialCallback(deviceIDValidationError, null);
 						else deviceIDPartialCallback(null, validatedDeviceID);
-					});
+					})
 				},
 				lectureCode: function(lectureCodePartialCallback) {
-					this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode) {
+					this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode){
 						if (lectureCodeValidationError) lectureCodePartialCallback(lectureCodeValidationError, null);
 						else lectureCodePartialCallback(null, validatedLectureCode);
 					});
 				}
 			};
-
+			
 			async.parallel(validateForJoinLecture, function(validationError, validationResult){
 				if (validationError) callback(validationError, null);
 				else {
-					if (this.currentLectureCodes.indexOf(lectureCode) == -1) {
-						var wrongLectureCodeError = new Error("Lecture code does not exist");
-						callback(wrongLectureCodeError, null);
-					} else {
-						this.currentDeviceIds[validationResult["lectureCode"]].push(validationResult["deviceID"]);
-						var lectureResult = {
-							lectureCode: validationResult["lectureCode"],
-							time: new Date().toTimeString()
-						};
-						callback(null, lectureResult);
-					}
+					this.dataHandler.mapLectureCodeToStudent(validationResult["lectureCode"], validationResult["deviceID"], function(joinError, joinResult) {
+						if (joinError) callback(joinError, null);
+						else callback(null, joinResult);
+					});
 				}
 			});
 		};
-
-		Lecture.prototype.submitUnderstandingLevel = function(lectureCode, deviceId, timestamp, callback) {
-			var validateForUnderstanding = {
-				lectureCode: function(lectureCodePartialCallback) {
-					this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode) {
-						if (lectureCodeValidationError) lectureCodePartialCallback(lectureCodeValidationError, null);
-						else lectureCodePartialCallback(null, validatedLectureCode);
-					});
-				},
-				deviceID: function(deviceIDPartialCallback) {
-					this.validateDeviceId(deviceId, function(deviceIDValidationError, validatedDeviceId){
-						if (deviceIDValidationError) deviceIDPartialCallback(deviceIDValidationError, null);
-						else deviceIDPartialCallback(null, validatedDeviceId);
-					});
-				},
-				understandingLevel: function(understandingLevelPartialCallback) {
-					this.validateUnderstandingLevel(understandingLevel, function(understandingLevelValidationError, validatedUnderstandingLevel){
-						if (understandingLevelValidationError) understandingLevelPartialCallback(understandingLevelValidationError, null);
-						else understandingLevelPartialCallback(null, validatedUnderstandingLevel);
-					});
-				} 
-			};
-
-			async.parallel(validateForUnderstanding, function(validationError, validationResult) {
-				if (validationError) callback(validationError, null);
-				else {
-					var now = new Date().toTimeString();
-					var understandingData = new UnderstandingData(validationResult["understandingLevel"], now);
-
-					var lectureData = this.understandingLevels[validationResult["lectureCode"]];
-					if (!lectureData) {
-						var wrongLectureCodeError = new Error("Lecture code " + validationResult["lectureCode"] + " does not exist");
-						callback(null, wrongLectureCodeError, null);
-					} else {
-						var deviceData = lectureData[validationResult["deviceID"]];
-						if (!deviceData) {
-							var wrongDeviceIDError = new Error("Device ID " + validationResult["deviceID"] + " does not exist");
-							callback(wrongDeviceIDError, null);
-						} else {
-							deviceData.push(understandingData);
-							var submitResult = {
-								result: "Success!"
-							};
-							callback(null, submitResult);
-						}
-					}
-				}
-			});
-		};
-
+		
+		Lecture.prototype.endLecture = function(lectureCode, callback) {};
+		
 		Lecture.prototype.endLecture = function(lectureCode, callback) {
 			this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode) {
 				if (lectureCodeValidationError) callback(lectureCodeValidationError, null);
@@ -193,7 +131,57 @@ exports.Lecture = (function(){
 				}
 			});
 		};
+		
+		
+		Lecture.prototype.submitUnderstandingLevel = function(lectureCode, deviceId, timestamp, callback) {
+			var validateForUnderstanding = {
+				lectureCode: function(lectureCodePartialCallback) {
+					this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode) {
+						if (lectureCodeValidationError) lectureCodePartialCallback(lectureCodeValidationError, null);
+						else lectureCodePartialCallback(null, validatedLectureCode);
+					});
+				},
+				deviceID: function(deviceIDPartialCallback) {
+					this.validateDeviceId(deviceId, function(deviceIDValidationError, validatedDeviceId){
+						if (deviceIDValidationError) deviceIDPartialCallback(deviceIDValidationError, null);
+						else deviceIDPartialCallback(null, validatedDeviceId);
+					});
+				},
+				understandingLevel: function(understandingLevelPartialCallback) {
+					this.validateUnderstandingLevel(understandingLevel, function(understandingLevelValidationError, validatedUnderstandingLevel){
+						if (understandingLevelValidationError) understandingLevelPartialCallback(understandingLevelValidationError, null);
+						else understandingLevelPartialCallback(null, validatedUnderstandingLevel);
+					});
+				} 
+			};
 
+			async.parallel(validateForUnderstanding, function(validationError, validationResult) {
+				if (validationError) callback(validationError, null);
+				else {
+					var now = new Date().toTimeString();
+					var understandingData = new UnderstandingData(validationResult["understandingLevel"], now);
+
+					var lectureData = this.understandingLevels[validationResult["lectureCode"]];
+					if (!lectureData) {
+						var wrongLectureCodeError = new Error("Lecture code " + validationResult["lectureCode"] + " does not exist");
+						callback(null, wrongLectureCodeError, null);
+					} else {
+						var deviceData = lectureData[validationResult["deviceID"]];
+						if (!deviceData) {
+							var wrongDeviceIDError = new Error("Device ID " + validationResult["deviceID"] + " does not exist");
+							callback(wrongDeviceIDError, null);
+						} else {
+							deviceData.push(understandingData);
+							var submitResult = {
+								result: "Success!"
+							};
+							callback(null, submitResult);
+						}
+					}
+				}
+			});
+		};
+		
 		Lecture.prototype.refreshAverageUnderstandingLevel = function(lectureCode, callback) {
 			this.validateLectureCode(lectureCode, function(lectureCodeValidationError, validatedLectureCode){
 				if (lectureCodeValidationError) callback(lectureCodeValidationError, null);

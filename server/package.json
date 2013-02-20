@@ -4,7 +4,8 @@
 	"version": "0.0.1",
 	"private": "true",
 	"dependencies": {
-		"express": "3.x",
+		"express": "3.1.0",
+		"mongojs": "0.6.2",
 		"async": "0.1.22",
 		"bcrypt": "0.7.3",
 		"socket.io": "0.9.6",

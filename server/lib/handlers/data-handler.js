@@ -16,6 +16,20 @@ exports.DataHandler = (function() {
 		var host = dbHost;
 		var dbUrl = "engageDB";
 		var db = mongo.connect(dbUrl);
+		// usedLectureCodes is an associative array
+		// key: course code
+		// value: [lecture codes]
+		var usedLectureCodes = {};
+		
+		// currentLectureCodes is an array containing
+		// all the lecture codes currently in use
+		var currentLectureCodes = [];
+		
+		// currentDeviceIds is an associative array
+		// key: lecture code
+		// value: [device Ids]
+		var currentDeviceIds = {};
+		
 		return {
 			findData: function(bucketName, criteria, callback) {
 				db[bucketName].find(criteria, function(findError, findResult) {
@@ -26,6 +40,38 @@ exports.DataHandler = (function() {
 				db[bucketName].save(data, function(saveError, saveResult){
 					callback(saveError, saveResult);
 				});
+			},
+			generateNewLectureCode: function(courseCode, callback) {
+				var lectureCode = "";
+				while(lectureCode.length < 8) {
+					lectureCode = Math.random().toString(36).substr(2);
+					lectureCode = lectureCode.substr(0, 8);
+					var existingUsedLectureCodes = usedLectureCodes[courseCode];
+					if (!existingUsedLectureCodes) {
+						usedLectureCodes[courseCode] = [lectureCode];
+						break;
+					} else {
+						if (existingUsedLectureCodes.indexOf(lectureCode) == -1) {
+							existingUsedLectureCodes.push(lectureCode);
+							break;
+						} else lectureCode = "";
+					}
+				}
+				callback(null, lectureCode);
+			},
+			mapLectureCodeToStudent: function(lectureCode, deviceId, callback) {
+				if (currentLectureCodes.indexOf(lectureCode) == -1) {
+					var wrongLectureCodeError = new Error("Lecture code does not exist");
+					callback(wrongLectureCodeError, null);
+				} else {
+					currentDeviceIds[lectureCode].push(deviceId);
+					var currentTS = new Date().toTimeString();
+					var result = {
+						lectureCode: lectureCode,
+						time: currentTS
+					};
+					callback(null, result);
+				}
 			}
 		}
 	}
