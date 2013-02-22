@@ -41,6 +41,11 @@ exports.DataHandler = (function() {
 		// key: username
 		// value: socket
 		var socketMap = {};
+		
+		// currentlyLecturing is an associative array
+		// key: lecture code
+		// value: lecturer username
+		var currentlyLecturing = {};
 				
 		return {
 			addSocket: function(username, io, callback) {
@@ -83,7 +88,7 @@ exports.DataHandler = (function() {
 					callback(removeError, removeResult);
 				});
 			},
-			generateNewLectureCode: function(courseCode, callback) {
+			generateNewLectureCode: function(courseCode, username, callback) {
 				var lectureCode = "";
 				while(lectureCode.length < 8) {
 					lectureCode = Math.random().toString(36).substr(2);
@@ -99,6 +104,7 @@ exports.DataHandler = (function() {
 						} else lectureCode = "";
 					}
 				}
+				currentlyLecturing[lectureCode] = username;
 				callback(null, lectureCode);
 			},
 			mapLectureCodeToStudent: function(lectureCode, deviceId, callback) {
