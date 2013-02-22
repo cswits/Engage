@@ -13,7 +13,7 @@ exports.Validator = (function() {
 		return {
 			validate: function(value, errorMessage, callback) {
 				if ((!value) ||((typeof value == "string") && (value.length == 0))) {
-					var missingValueError = nhew Error(errorMessage);
+					var missingValueError = new Error(errorMessage);
 					callback(missingValueError, null);
 				} else callback(null, value);
 			}

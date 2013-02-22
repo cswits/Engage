@@ -157,7 +157,7 @@ exports.Lecture = (function(){
 						var wrongLectureCodeError = new Error("Lecture code " + validatedLectureCode + " does not exist");
 						callback(wrongLectureCodeError, null);
 					} else {
-						async.forEach(...);
+						callback(null, null);
 					}
 				}
 			});
