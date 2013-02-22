@@ -182,6 +182,20 @@ exports.DataHandler = (function() {
 									var addResult = {
 										result: "Success!"
 									};
+									// send understanding average to lecturer client
+									var lecturerUsername =  currentlyLecturing[lectureCode];
+									// only try to send it if the lecturer username exists
+									if (lecturerUsername) {
+										var lecturerSocket = socketMap[lecturerUsername];
+										// extract the averages
+										var recentUnderstandings = [];
+										var allUnderstandings = understandingLevels[lectureCode];
+										// loop over this associative array and extract all the last elements
+										var averageData = {
+											averages: recentUnderstandings
+										};
+										lecturerSocket.emit("averages", averageData);
+									}
 									callback(null, addResult);
 								}
 							}
