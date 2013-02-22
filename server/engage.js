@@ -5,8 +5,6 @@ var express = require('express');
 var app = express();
 app.set( "jsonp callback", true);
 
-var lecture = new Lecture(27017, "localhost");
-
 // define configuration for express
 app.configure(function() {
         app.use(express.bodyParser());
@@ -14,9 +12,11 @@ app.configure(function() {
         app.use(app.router);
 });
 
+var io = require('socket.io').listen(app);
+
 // routes
 
-require('./routes/lecturer-routes')(app);
+require('./routes/lecturer-routes')(app, io);
 require('./routes/lecture-routes')(app);
 
 app.listen(7001);

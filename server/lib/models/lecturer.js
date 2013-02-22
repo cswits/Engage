@@ -5,9 +5,10 @@ var Validator = require('../handlers/validator').Validator;
 var DataHandler = require('../handlers/data-handler').DataHandler;
 
 exports.Lecturer = (function(){
-	function Lecturer(port, host) {
+	function Lecturer(port, host, io) {
 		this.validator = Validator.getInstance();
 		this.dataHandler = DataHandler.getInstance(port, host);
+		this.ioObject = io;
 		
 		Lecturer.prototype.authenticate = function(username, password, callback) {
 			var validateUserForAuthentication = {
@@ -48,10 +49,15 @@ exports.Lecturer = (function(){
 												var authenticationError = new Error("Authenticaton failed for lecturer %s. The username and password do not correspond!", validationResult["username"]);
 												callback(authenticationError, null);
 											} else {
-												var authenticationResult = {
-													result: "Success!"
-												};
-												callback(null, authenticationResult);
+												this.dataHandler.addSocket(validationResult["username"], this.ioObject, function(addSocketError, addSocketResult) {
+													if (addSocketError) callback(addSocketError, null);
+													else {
+														var authenticationResult = {
+															result: "Success!"
+														};
+														callback(null, authenticationResult);
+													}
+												});												
 											}
 										}
 									});

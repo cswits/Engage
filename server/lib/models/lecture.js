@@ -7,16 +7,31 @@ var UnderstandingData = require('../handlers/understanding-data').UnderstandingD
 
 
 exports.Lecture = (function(){
-	function Lecture(port, host) {
+	function Lecture(port, host, io) {
 		this.validator = Validator.getInstance();
-		this.dataHandler = DataHandler.getInstance(port, host);
+		this.dataHandler = DataHandler.getInstance(port, host, io);
 		
 		// generate new lecture code
-		Lecture.prototype.getNewLectureCode = function(courseCode, callback) {
-			this.validateCourseCode(courseCode, function(validationError, validatedCourseCode) {
+		Lecture.prototype.getNewLectureCode = function(courseCode, lecturerUsername, callback) {
+			var validateForLectureCode = {
+				courseCode: function(courseCodePartialCallback){
+					this.validateCourseCode(courseCode, function(couseCodeValidationError, validatedCourseCode) {
+						if (courseCodeValidationError) courseCodePartialCallback(courseCodeValidationError, null);
+						else courseCodePartialCallback(null, validatedCourseCode);
+					});
+				},
+				lecturerUsername: function(lecturerUsernamePartialCallback) {
+					this.validateUsername(lecturerUsername, function(lecturerUsernameError, validatedUsername) {
+						if (lecturerUsernameError) lecturerUsernamePartialCallback(lecturerUsernameError, null);
+						else lecturerUsernamePartialCallback(null, validatedUsername);
+					});
+				}
+			};
+			
+			async.parallel(validateForLectureCode, function(validationError, validationResult) {
 				if (validationError) callback(validationError, null);
 				else {
-					this.dataHandler.generateNewLectureCode(validatedCourseCode, function(lectureCodeError, lectureCodeResult){
+					this.dataHandler.generateNewLectureCode(validationResult["courseCode"], validationResult["lecturerUsername"], function(lectureCodeError, lectureCodeResult) {
 						if (lectureCodeError) callback(lectureCodeError, null);
 						else {
 							var newLectureCodeResult = {
@@ -28,7 +43,7 @@ exports.Lecture = (function(){
 				}
 			});
 		};
-		
+				
 		// joining a lecture
 		Lecture.prototype.joinLecture = function(lectureCode, deviceID, callback) {
 			var validateForJoinLecture = {
@@ -152,6 +167,13 @@ exports.Lecture = (function(){
 			this.validator.validate(value, errorMessage, function(validationError, validationResult) {
 				if (validationError) callback(validationError, null);
 				else callback(null, validationResult);
+			});
+		};
+		
+		Lecture.prototype.validateUsername = function(username, errorMessage, callback) {
+			this.simpleValidation(username, "Username missing!", function(usernameValidationError, validatedUsername) {
+				if (usernameValidationError) callback(usernameValidationError, null);
+				else callback(null, validatedUsername)
 			});
 		};
 

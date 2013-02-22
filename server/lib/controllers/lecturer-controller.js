@@ -2,8 +2,8 @@ var Lecturer = require('../models/lecturer').Lecturer;
 var ResponseHandler = require('../handlers/response-handler').ResponseHandler;
 
 exports.LecturerController = (function() {
-	function LecturerController() {
-		this.prototype.lecturer = new Lecturer(27017, "localhost");
+	function LecturerController(io) {
+		this.prototype.lecturer = new Lecturer(27017, "localhost", io);
 		this.prototype.responseHandler = ResponseHandler.getInstance();
 		
 		LecturerController.prototype.authenticateLecturer = function(request, response) {

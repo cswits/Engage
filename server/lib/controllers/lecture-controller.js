@@ -10,8 +10,9 @@ exports.LectureController = (function(){
 			console.log("Generating a new lecture code for course...");
 			
 			var courseCode = request.body["courseCode"];
+			var lecturerUsername = request.body["username"];
 			
-			this.lecture.getNewLectureCode(courseCode, function(newCourseCodeError, newCourseCodeResult){
+			this.lecture.getNewLectureCode(courseCode, lecturerUsername, function(newCourseCodeError, newCourseCodeResult){
 				this.responseHandler.handleResponse(newCourseCodeError, newCourseCodeResult, request, response);
 			});
 		};

@@ -3,7 +3,7 @@ var mongo = require('mongojs');
 exports.DataHandler = (function() {
 	this.dataHandlerInstance = null;
 	
-	var getInstance = function(port, host) {
+	var getInstance = function(port, host, io) {
 		if (!this.dataHandlerInstance) {
 			this.dataHandlerInstance = createInstance(port, host);
 		}
@@ -37,7 +37,20 @@ exports.DataHandler = (function() {
 		// value: [understanding levels]
 		var understandingLevels = {};
 		
+		// socketMap is an associative array
+		// key: username
+		// value: socket
+		var socketMap = {};
+				
 		return {
+			addSocket: function(username, io, callback) {
+				if (io) {
+					io.sockets.on('connection', function(socket) {
+						socketMap[username] = socket
+					});
+				}
+				callback(null, true);
+			},
 			findLecturers: function(lecturerUsername, callback) {
 				var criteria = {username: lecturerUsername};
 				findData("lecturers", criteria, function(findError, findResult) {

@@ -1,5 +1,5 @@
 // requiring packages
-var LectureController = requires('../lib/controllers/lecture-controller').LectureController;
+var LectureController = require('../lib/controllers/lecture-controller').LectureController;
 
 module.exports = function(app) {	
 	// lecturer creating a new lecture code
