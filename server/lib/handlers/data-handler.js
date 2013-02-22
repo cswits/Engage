@@ -191,6 +191,13 @@ exports.DataHandler = (function() {
 										var recentUnderstandings = [];
 										var allUnderstandings = understandingLevels[lectureCode];
 										// loop over this associative array and extract all the last elements
+										for (var currentDevice in allUnderstandings) {
+											var deviceUnderstandings = allUnderstandings[currentDevice];
+											var latestUnderstandingData = deviceUnderstandings[deviceUnderstandings.length - 1];
+											var currentLevel = latestUnderstandingData.getLevel();
+											var levelAsNumber = parseInt(currentLevel);
+											recentUnderstandings.push(levelAsNumber);
+										}
 										var averageData = {
 											averages: recentUnderstandings
 										};
