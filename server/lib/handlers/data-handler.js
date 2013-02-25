@@ -1,21 +1,25 @@
+// data-hanler.js
+"use strict";
+
 var mongo = require('mongojs');
 
 exports.DataHandler = (function() {
 	this.dataHandlerInstance = null;
-	
-	var getInstance = function(port, host, io) {
+
+	var getInstance = function(port, host) {
 		if (!this.dataHandlerInstance) {
 			this.dataHandlerInstance = createInstance(port, host);
 		}
-		
+
 		return this.dataHandlerInstance;
-	}
-	
+	};
+
 	var createInstance = function(dbPort, dbHost) {
 		var port = dbPort;
 		var host = dbHost;
 		var dbUrl = "engageDB";
 		var db = mongo.connect(dbUrl);
+
 		// usedLectureCodes is an associative array
 		// key: course code
 		// value: [lecture codes]
@@ -46,30 +50,30 @@ exports.DataHandler = (function() {
 		// key: lecture code
 		// value: lecturer username
 		var currentlyLecturing = {};
-				
+
 		return {
 			addSocket: function(username, io, callback) {
 				if (io) {
 					io.sockets.on('connection', function(socket) {
-						socketMap[username] = socket
+						socketMap[username] = socket;
 					});
 				}
 				callback(null, true);
 			},
 			findLecturers: function(lecturerUsername, callback) {
 				var criteria = {username: lecturerUsername};
-				findData("lecturers", criteria, function(findError, findResult) {
+				this.findData("lecturers", criteria, function(findError, findResult) {
 					callback(findError, findResult);
 				});
 			},
 			addLecturer: function(data, callback) {
-				saveData("lecturers", data, function(addError, addResult) {
+				this.saveData("lecturers", data, function(addError, addResult) {
 					callback(addError, addResult);
 				});
 			},
 			deleteLecturer: function(lecturerUsername, callback) {
 				var criteria = {username: lecturerUsername};
-				deleteData("lecturers", criteria, function(deleteError, deleteResult){
+				this.deleteData("lecturers", criteria, function(deleteError, deleteResult){
 					callback(deleteError, deleteResult);
 				});
 			},
@@ -141,12 +145,12 @@ exports.DataHandler = (function() {
 					callback(unknownLectureCodeError, null);
 				} else {
 					var deviceIndex = allLectureDevices.indexOf(deviceId);
-					if (deviceIndex == -1) {
+					if (deviceIndex === -1) {
 						var unknownDeviceError = new Error("Device unknown!");
 						callback(unknownDeviceError, null);
 					} else {
 						allLectureDevices.splice(deviceIndex, 1);
-						if (allLectureDevices.length == 0) delete currentDeviceIds[lectureCode];
+						if (allLectureDevices.length === 0) delete currentDeviceIds[lectureCode];
 						var leaveResult = {
 							result: "Success!"
 						};
@@ -160,19 +164,19 @@ exports.DataHandler = (function() {
 					var wrongLectureCodeError = new Error("Lecture code %s unknown for understanding levels", lectureCode);
 					callback(wrongLectureCodeError, null);
 				} else {
-					var deviceData = lectureData[deviceID];
+					var deviceData = lectureData[deviceId];
 					if (!deviceData) {
 						var wrongDeviceIDError = new Error("Devicd ID %s unknown for understanding levels", deviceId);
 						callback(wrongDeviceIDError, null);
 					} else {
-						deviceData.push(undertandingData);
+						deviceData.push(understandingData);
 						var understandingRecord = {
 							lectureCode: lectureCode,
 							deviceId: deviceId,
 							timestamp: understandingData.getTimestamp(),
 							undertandingLevel: understandingData.getLevel()
 						};
-						saveData("understandings", understandingRecord, function(error, result){
+						this.saveData("understandings", understandingRecord, function(error, result){
 							if (error) callback(error, null);
 							else {
 								if (!result) {
@@ -210,6 +214,6 @@ exports.DataHandler = (function() {
 					}
 				}
 			}
-		}
-	}
+		};
+	};
 })();
