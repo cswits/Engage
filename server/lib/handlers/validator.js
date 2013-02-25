@@ -2,14 +2,14 @@
 "use strict";
 
 exports.Validator = (function() {
-	this.validatorInstance = null;
+	var validatorInstance = null;
 	
 	var getInstance = function() {
-		if (!this.validatorInstance) {
-			this.validatorInstance = createInstance();
+		if (!validatorInstance) {
+			validatorInstance = createInstance();
 		}
 		
-		return this.validatorInstance;
+		return validatorInstance;
 	};
 	
 	var createInstance = function() {
