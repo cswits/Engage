@@ -17,7 +17,7 @@ If you wanna host your own version of *Engage*, all you have to do is to clone t
 
 We use *MongoDb* as DBMS. So, you need to install mongodb on your machine. To start the mongodb server you can do the following:
 <pre><code>
-	mongod --dbpath [database path] --port cxxxxx --host dasdsad
+	mongod --dbpath [database path] --port [port number] --bind_ip [ip address]
 </code></pre>
 
 ## Installing Node.js

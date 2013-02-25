@@ -1,10 +1,11 @@
 // lecture-controller.js
-"use strict";
 
 var Lecture = require('../models/lecture').Lecture;
 var ResponseHandler = require('../handlers/response-handler').ResponseHandler;
 
 exports.LectureController = (function(){
+	"use strict";
+	
 	function LectureController() {
 		this.lecture = new Lecture(27017, "localhost");
 		this.responseHandler = ResponseHandler.getInstance();

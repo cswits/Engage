@@ -1,7 +1,8 @@
 // understanding-data.js
-"use strict";
 
 exports.UnderstandingData = (function(){
+	"use strict";
+
 	function UnderstandingData(level, ts) {
 		this.level = level;
 		this.timestamp = ts;

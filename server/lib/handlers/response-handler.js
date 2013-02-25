@@ -1,7 +1,8 @@
 // response-handler.js
-"use strict";
 
 exports.ResponseHandler = (function(){
+	"use strict";
+	
 	var responseHandlerInstance = null;
 	
 	var getInstance = function() {

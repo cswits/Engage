@@ -1,9 +1,10 @@
 // data-hanler.js
-"use strict";
 
 var mongo = require('mongojs');
 
 exports.DataHandler = (function() {
+	"use strict";
+	
 	var dataHandlerInstance = null;
 
 	var getInstance = function(port, host) {

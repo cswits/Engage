@@ -1,5 +1,4 @@
 // lecturer.js
-"use strict";
 
 var bcrypt = require("bcrypt");
 var async = require('async');
@@ -7,6 +6,8 @@ var Validator = require('../handlers/validator').Validator;
 var DataHandler = require('../handlers/data-handler').DataHandler;
 
 exports.Lecturer = (function() {
+	"use strict";
+
 	function Lecturer(port, host, io) {
 		this.validator = Validator.getInstance();
 		this.dataHandler = DataHandler.getInstance(port, host);
