@@ -195,7 +195,7 @@ exports.DataHandler = (function() {
 											var deviceUnderstandings = allUnderstandings[currentDevice];
 											var latestUnderstandingData = deviceUnderstandings[deviceUnderstandings.length - 1];
 											var currentLevel = latestUnderstandingData.getLevel();
-											var levelAsNumber = parseInt(currentLevel);
+											var levelAsNumber = Number(currentLevel);
 											recentUnderstandings.push(levelAsNumber);
 										}
 										var averageData = {
