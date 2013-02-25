@@ -1,6 +1,6 @@
 # Engage
 
-__Engage__ is a Mobile app to gauge audience interest during a lecture. At the beginning of a lecture, a *lecturer* obtains a lecture code that he/she communicates to the audience (students). The latter can then use the code to join the lecture and from time to time inform of their level of understanding of the concepts being discussed.
+__Engage__ is a Mobile app to gauge audience interest during a lecture. At the beginning of a lecture, a *lecturer* obtains a lecture code (from the server) that he/she communicates to the audience (his/her students). The latter can then use the code to *join* the lecture and from time to time inform of their level of understanding of the concepts being discussed during the class.
 
 # Architecture and Technology
 
