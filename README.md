@@ -6,7 +6,7 @@ __Engage__ is a Mobile app to gauge audience interest during a lecture. At the b
 
 *Engage* is a client/server application. The client can be a Web interface or a mobile application. Currently, we use the *PhoneGap* framework (including other Web stuff like jquery mobile) to implement the mobile app. As for the server, it is developed with node.js
 
-To be continued...
+Work in progress...
 
 #Installation
 
