@@ -1,3 +1,6 @@
+// response-handler.js
+"use strict";
+
 exports.ResponseHandler = (function(){
 	this.responseHandlerInstance = null;
 	
@@ -7,13 +10,13 @@ exports.ResponseHandler = (function(){
 		}
 		
 		return this.responseHandlerInstance;
-	}
+	};
 	
-	var createIntance = function() {
+	var createInstance = function() {
 		return {
 			handleResponse: function(error, result, request, response) {
 				if (error) this.respondWithError(error, response);
-				else this.respondWithSuccess(result, request, respose);
+				else this.respondWithSuccess(result, request, response);
 			},
 			respondWithError: function(error, response) {
 				var errorMessage = error.message;
@@ -27,6 +30,6 @@ exports.ResponseHandler = (function(){
 				response.header('Charset', 'utf8');
 				response.send(request.query.callback + '(' + JSON.stringify(result) + ')');
 			}
-		}
-	}
+		};
+	};
 })();
