@@ -4,14 +4,14 @@
 var mongo = require('mongojs');
 
 exports.DataHandler = (function() {
-	this.dataHandlerInstance = null;
+	var dataHandlerInstance = null;
 
 	var getInstance = function(port, host) {
-		if (!this.dataHandlerInstance) {
-			this.dataHandlerInstance = createInstance(port, host);
+		if (!dataHandlerInstance) {
+			dataHandlerInstance = createInstance(port, host);
 		}
 
-		return this.dataHandlerInstance;
+		return dataHandlerInstance;
 	};
 
 	var createInstance = function(dbPort, dbHost) {
