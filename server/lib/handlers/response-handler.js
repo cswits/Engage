@@ -2,14 +2,14 @@
 "use strict";
 
 exports.ResponseHandler = (function(){
-	this.responseHandlerInstance = null;
+	var responseHandlerInstance = null;
 	
 	var getInstance = function() {
-		if (!this.responseHandlerInstance) {
-			this.responseHandlerInstance = createInstance();
+		if (!responseHandlerInstance) {
+			responseHandlerInstance = createInstance();
 		}
 		
-		return this.responseHandlerInstance;
+		return responseHandlerInstance;
 	};
 	
 	var createInstance = function() {
