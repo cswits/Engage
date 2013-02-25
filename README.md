@@ -6,6 +6,8 @@ __Engage__ is a Mobile app to gauge audience interest during a lecture. At the b
 
 *Engage* is a client/server application. The client can be a Web interface or a mobile application. Currently, we use the *PhoneGap* framework (including other Web stuff like jquery mobile) to implement the mobile app. As for the server, it is developed with node.js
 
+To be continued...
+
 #Installation
 
 ## Server Code
@@ -15,7 +17,7 @@ If you wanna host your own version of *Engage*, all you have to do is to clone t
 	node engage.js
 </code></pre>
 
-We use *MongoDb* as DBMS. So, you need to install mongodb on your machine. To start the mongodb server you can do the following:
+We use the port number *7001*, but you can change that value in the file engage.js if that port number conflicts with other processes being run on your machine. We also use *MongoDb* as DBMS. So, you need to install mongodb on your machine. To start the mongodb server you can do the following:
 <pre><code>
 	mongod --dbpath [database path] --port [port number] --bind_ip [ip address]
 </code></pre>
