@@ -34,7 +34,7 @@ exports.LecturerController = (function() {
 			console.log("Deleting an existing lecturer from the system...");
 			
 			var username = request.params["username"];
-			this.lecturer.delete(username, function(deleteError, deleteResult){
+			this.lecturer.deleteLecturer(username, function(deleteError, deleteResult){
 				this.responseHandler.handleResponse(deleteError, deleteResult, request, response);
 			});
 		};
