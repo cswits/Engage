@@ -1,3 +1,6 @@
+// validator.js
+"use strict";
+
 exports.Validator = (function() {
 	this.validatorInstance = null;
 	
