@@ -90,6 +90,37 @@ exports.Lecture = class Lecture
                     else
                         callback null, leaveResult
 
+    submitUnderstandingLevel: (lectureCode, deviceId, understandingLevel, callback) =>
+        validateForUnderstanding = 
+            lectureCode: (lectureCodePartialCallback) =>
+                @validateLectureCode lectureCode, (lectureCodeValidationError, validatedLectureCode) =>
+                    if lectureCodeValidationError?
+                        lectureCodePartialCallback lectureCodeValidationError, null
+                    else
+                        lectureCodePartialCallback null, validatedLectureCode
+            deviceId: (deviceIDPartialCallback) =>
+                @validateDeviceId deviceId, (deviceIDValidationError, validatedDeviceId) =>
+                    if deviceIDValidationError?
+                        deviceIDPartialCallback deviceIDValidationError, null
+                    else
+                        deviceIDPartialCallback null, validatedDeviceId
+            understandingLevel: (understandingLevelPartialCallback) =>
+                @validateForUnderstanding understandingLevel, (understandingLevelValidationError, validatedUnderstandingLevel) =>
+                    if understandingLevelValidationError?
+                        understandingLevelPartialCallback understandingLevelValidationError, null
+                    else
+                        understandingLevelPartialCallback null, validatedUnderstandingLevel
+        async.parallel validateForUnderstanding, (validationError, validationResult) =>
+            if validationError?
+                callback validationError, null
+            else
+                now = new Date().toTimeString()
+                understandingData = new UnderstandingData validationResult.understandingLevel, now
+                @dataHandler.addUnderstandingLevel validationResult, understandingData, (understandingError, understandingResult) =>
+                    if understandingError?
+                        callback understandingError, null
+                    else
+                        callback null, understandingResult
 
 	simpleValidation: (value, errorMessage, callback) =>
 		@validator.validate value, errorMessage, (validationError, validationResult) =>
