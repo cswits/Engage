@@ -1,12 +1,12 @@
 # lecture-controller.coffee
 
 Lecture = require('../models/lecture').Lecture;
-ResponseHandler = require('../handlers/response-handler').ResponseHandler;
+ResponseHandlerFactory = require('../handlers/response-handler').ResponseHandlerFactory;
 
 exports.LectureController = class LectureController
 	constructor: () ->
 		@lecture = new Lecture
-		@responseHandler = ResponseHandler.getResponseHandlerInstance()
+		@responseHandler = ResponseHandlerFactory.getResponseHandlerInstance()
 
 	createLectureCode: (request, response) =>
 		console.log "Generating a new lecture code for a course..."
