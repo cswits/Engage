@@ -8,10 +8,10 @@ exports.DataHandlerFactory = class DataHandlerFactory
 		_dataHandlerInstance ?= new DataHandler port, host
 
 	class DataHandler
-		constructor: (@port, @host) ->
-			@db = mongo.connect "engageDB"
-			@usedLectureCodes = {}
-			@currentLectureCodes = {}
+        constructor: (@port, @host) ->
+            @db = mongo.connect "engageDB"
+            @usedLectureCodes = {}
+            @currentLectureCodes = {}
             @currentDeviceIds = {}
             @understandingLevels = {}
             @socketMap = {}

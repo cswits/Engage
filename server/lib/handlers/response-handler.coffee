@@ -21,7 +21,7 @@ exports.ResponseHandlerFactory = class ResponseHandlerFactory
 
 		respondWithSuccess: (result, request, response) =>
 			response.header "Access-Control-Allow-Origin", "*"
-            response.header "Access-Control-Allow-Headers", "X-Requested-With"
-            response.header "Content-type", "application/json"
-            response.header 'Charset', 'utf8'
-            response.send request.query.callback + '(' + JSON.stringify(result) + ')'
+			response.header "Access-Control-Allow-Headers", "X-Requested-With"
+			response.header "Content-type", "application/json"
+			response.header 'Charset', 'utf8'
+			response.send request.query.callback + '(' + JSON.stringify(result) + ')'
