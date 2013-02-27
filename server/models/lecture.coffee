@@ -10,10 +10,32 @@ exports.Lecture = class Lecture
 		@dataHandler = DataHandlerFactory.getDataHandlerInstance()
 
 	getNewLectureCode: (courseCode, lecturerUsername, callback) =>
-		console.log "Creating a new lecture code..."
+        validateForLectureCode = 
+            courseCode: (courseCodePartialCallback) =>
+                @validateCourseCode courseCode, (courseCodeValidationError, validatedCourseCode) =>
+                    if courseCodeValidationError?
+                        courseCodePartialCallback courseCodeValidationError, null
+                    else
+                        courseCodePartialCallback null, validatedCourseCode
+            lecturerUsername: (lecturerUsernamePartialCallback) =>
+                @validateUsername lecturerUsername, (usernameValidationError, validatedUsername) =>
+                    if usernameValidationError?
+                        lecturerUsernamePartialCallback usernameValidationError, null
+                    else
+                        lecturerUsernamePartialCallback null, validatedUsername
+        async.parallel validateForLectureCode, (validationError, validationResult) =>
+            if validationError?
+                callback validationError, null
+            else
+                @dataHandler.generateNewLectureCode validationResult, (lectureCodeError, lectureCodeResult) =>
+                    if lectureCodeError?
+                        callback lectureCodeError, null
+                    else
+                        callback null, lectureCodeResult
 
 	joinLecture: (lectureCode, deviceId, callback) =>
 		console.log "joining a lecture..."
+
 
 	endLecture: (lectureCode, callback) =>
 		console.log "ending a lecture..."
