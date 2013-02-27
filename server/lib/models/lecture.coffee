@@ -34,14 +34,42 @@ exports.Lecture = class Lecture
                         callback null, lectureCodeResult
 
 	joinLecture: (lectureCode, deviceId, callback) =>
-		console.log "joining a lecture..."
+        validateForJoinLecture = 
+            deviceId: (deviceIDPartialCallback) =>
+                @validateDeviceId deviceId, (deviceIDValidationError, validatedDeviceId) =>
+                    if deviceIDValidationError?
+                        deviceIDPartialCallback deviceIDValidationError, null
+                    else
+                        deviceIDPartialCallback null, validateDeviceId
+            lectureCode: (lectureCodePartialCallback) =>
+                @validateLectureCode lectureCode, (lectureCodeValidationError, validatedLectureCode) =>
+                    if lectureCodeValidationError?
+                        lectureCodePartialCallback lectureCodeValidationError, null
+                    else
+                        lectureCodePartialCallback null, validatedLectureCode
+        async.parallel validateForJoinLecture, (validationError, validationResult) =>
+            if validationError?
+                callback validationError, null
+            else
+                callback null, validationResult
 
 
 	endLecture: (lectureCode, callback) =>
-		console.log "ending a lecture..."
+        @validateLectureCode lectureCode, (lectureCodeValidationError, validatedLectureCode) =>
+            if lectureCodeValidationError?
+                callback lectureCodeValidationError, null
+            else
+                @dataHandler.endLecture validatedLectureCode, (endLectureError, endLectureResult) =>
+                    if endLectureError?
+                        callback endLectureError, null
+                    else
+                        callback null, endLectureResult
+
 
 	leaveLecture: (lectureCode, deviceId, callback) =>
 		console.log "leaving a lecture..."
+
+
 
 	simpleValidation: (value, errorMessage, callback) =>
 		@validator.validate value, errorMessage, (validationError, validationResult) =>
