@@ -67,8 +67,28 @@ exports.Lecture = class Lecture
 
 
 	leaveLecture: (lectureCode, deviceId, callback) =>
-		console.log "leaving a lecture..."
-
+        validateForLeaveLecture = 
+            lectureCode: (lectureCodePartialCallback) =>
+                @validateLectureCode lectureCode, (lectureCodeValidationError, validatedLectureCode) =>
+                    if lectureCodeValidationError?
+                        lectureCodePartialCallback lectureCodeValidationError, null
+                    else
+                        lectureCodePartialCallback null, validatedLectureCode
+            deviceId: (deviceIDPartialCallback) =>
+                @validateDeviceId deviceId, (deviceIDValidationError, validatedDeviceId) =>
+                    if deviceIDValidationError?
+                        deviceIDPartialCallback deviceIDValidationError, null
+                    else
+                        deviceIDPartialCallback null, validatedDeviceId
+        async.parallel validateForLeaveLecture, (validationError, validationResult) =>
+            if validationError?
+                callback validationError, null
+            else
+                @dataHandler.unmapLectureCodeFromStudent validationResult, (leaveError, leaveResult) =>
+                    if leaveError?
+                        callback leaveError, null
+                    else
+                        callback null, leaveResult
 
 
 	simpleValidation: (value, errorMessage, callback) =>
