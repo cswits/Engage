@@ -23,7 +23,7 @@ exports.Lecturer = class Lecturer
 					else
 						deletionResult = 
 							result: "Success!"
-						callback deletionResult, null
+						callback null, deletionResult
 
 	authenticate: (username, password, callback) =>
 		validateUserForAuthentication = 
