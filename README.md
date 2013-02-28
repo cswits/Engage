@@ -17,6 +17,11 @@ If you wanna host your own version of *Engage*, all you have to do is to clone t
 	node engage.js
 </code></pre>
 
+We also have a [coffee script](http://coffeescript.org) version, which we recommend. You can run it as follows:
+<pre><code>
+	coffee engage.coffee
+</code></pre>
+
 We use the port number *7001*, but you can change that value in the file engage.js if that port number conflicts with other processes being run on your machine. We also use *MongoDb* as DBMS. So, you need to install mongodb on your machine. To start the mongodb server you can do the following:
 <pre><code>
 	mongod --dbpath [database path] --port [port number] --bind_ip [ip address]
