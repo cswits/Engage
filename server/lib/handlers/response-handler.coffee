@@ -24,6 +24,6 @@ exports.ResponseHandlerFactory = class ResponseHandlerFactory
 			console.log "From inside respond with success..."
 			response.header "Access-Control-Allow-Origin", "*"
 			response.header "Access-Control-Allow-Headers", "X-Requested-With"
-			response.header "Content-type", "application/json"
+			response.header "Content-Type", "application/json"
 			response.header 'Charset', 'utf8'
 			response.send request.query.callback + '(' + JSON.stringify(result) + ')'

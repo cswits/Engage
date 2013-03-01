@@ -11,8 +11,9 @@ exports.LectureController = class LectureController
 	createLectureCode: (request, response) =>
 		console.log "Generating a new lecture code for a course..."
 
-		courseCode = request.body.courseCode
-		lecturerUsername = request.body.username
+		courseCode = request.query.courseCode
+		lecturerUsername = request.query.username
+		
 
 		@lecture.getNewLectureCode courseCode, lecturerUsername, (newCourseCodeError, newCourseCodeResult) =>
 			@responseHandler.handleResponse newCourseCodeError, newCourseCodeResult, request, response

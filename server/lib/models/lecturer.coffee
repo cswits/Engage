@@ -1,7 +1,7 @@
 # lecturer.coffee
 
-bcrypt = require("bcrypt");
-async = require('async');
+bcrypt = require 'bcrypt';
+async = require 'async';
 ValidatorFactory = require('../handlers/validator').ValidatorFactory;
 DataHandlerFactory = require('../handlers/data-handler').DataHandlerFactory;
 

@@ -51,7 +51,9 @@ exports.DataHandlerFactory = class DataHandlerFactory
             @db[bucketName].remove criteria, (deleteError, deleteResult) =>
                 callback deleteError, deleteResult
 
-        generateNewLectureCode: (courseCode, username, callback) =>
+        generateNewLectureCode: (lectureCodeDetails, callback) =>
+            courseCode = lectureCodeDetails[courseCode]
+            username = lectureCodeDetails[username]
             lectureCode = ""
             while lectureCode.length < 8
                 lectureCode = Math.random().toString(36).substr(2)
