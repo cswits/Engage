@@ -15,11 +15,13 @@ exports.ResponseHandlerFactory = class ResponseHandlerFactory
 				@respondWithSuccess result, request, response
 
 		respondWithError: (error, response) =>
+			console.log "From inside respond with error"
 			errorMessage = error.message
 			response.writeHead 404, {"Content-Type": "text/plain"}
 			response.end errorMessage
 
 		respondWithSuccess: (result, request, response) =>
+			console.log "From inside respond with success..."
 			response.header "Access-Control-Allow-Origin", "*"
 			response.header "Access-Control-Allow-Headers", "X-Requested-With"
 			response.header "Content-type", "application/json"

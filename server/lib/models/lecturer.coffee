@@ -26,15 +26,15 @@ exports.Lecturer = class Lecturer
 						callback null, deletionResult
 
 	authenticate: (username, password, callback) =>
-		validateUserForAuthentication = 
+		validateUserForAuthentication =
 			username: (usernamePartialCallback) =>
 				@validateUsername username, (usernameValidationError, validatedUsername) =>
 					if usernameValidationError?
 						usernamePartialCallback usernameValidationError, null
 					else
-						usernamePartialCallback null, validateUsername
+						usernamePartialCallback null, validatedUsername
 			password: (passwordPartialCallback) =>
-				@simpleValidation password, (passwordValidationError, validatedPassword) =>
+				@simpleValidation password, "Password missing!",(passwordValidationError, validatedPassword) =>
 					if passwordValidationError?
 						passwordPartialCallback passwordValidationError, null
 					else
@@ -74,10 +74,11 @@ exports.Lecturer = class Lecturer
 													callback null, authenticationResult
 
 
+
 	create: (username, password, lastname, firstname, title, callback) =>
 		validateForCreation = 
 			username: (usernamePartialCallback) =>
-				@validatedUsername username, (usernameValidationError, validatedUsername) =>
+				@validateUsername username, (usernameValidationError, validatedUsername) =>
 					if usernameValidationError?
 						usernamePartialCallback usernameValidationError, null
 					else
@@ -89,19 +90,19 @@ exports.Lecturer = class Lecturer
 					else
 						passwordPartialCallback null, hashedPassword
 			lastname: (lastnamePartialCallback) =>
-				@validatedLastname lastname, (lastnameValidationError, validatedLastname) =>
+				@validateLastname lastname, (lastnameValidationError, validatedLastname) =>
 					if lastnameValidationError?
 						lastnamePartialCallback lastnameValidationError, null
 					else
 						lastnamePartialCallback null, validatedLastname
 			firstname: (firstnamePartialCallback) =>
-				@validatedFirstname firstname, (firstNameValidationError, validatedFirstname) =>
+				@validateFirstname firstname, (firstNameValidationError, validatedFirstname) =>
 					if firstNameValidationError?
 						firstnamePartialCallback firstNameValidationError, null
 					else
 						firstnamePartialCallback null, validatedFirstname
 			title: (titlePartialCallback) =>
-				@validatedTitle title, (titleValidationError, validatedTitle) =>
+				@validateTitle title, (titleValidationError, validatedTitle) =>
 					if titleValidationError?
 						titlePartialCallback titleValidationError, null
 					else
@@ -141,7 +142,7 @@ exports.Lecturer = class Lecturer
 			else
 				callback null, validatedFirstname
 
-	validateLastName: (lastname, callback) =>
+	validateLastname: (lastname, callback) =>
 		@simpleValidation lastname, "Last name missing!", (lastnameValidationError, validatedLastname) =>
 			if lastnameValidationError?
 				callback lastnameValidationError, null
@@ -169,7 +170,6 @@ exports.Lecturer = class Lecturer
 								callback hashError, null
 							else
 								callback null, hashedPassword
-
 
 	simpleValidation: (value, errorMessage, callback) =>
 		@validator.validate value, errorMessage, (validationError, validationResult) =>

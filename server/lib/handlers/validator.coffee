@@ -10,7 +10,7 @@ exports.ValidatorFactory = class ValidatorFactory
 		constructor: () ->
 
 		validate: (value, errorMessage, callback) =>
-			if ((not value?) || ((typeof value is "string") && (value.length is 0)))
+			if ((not value?) or ((typeof value is "string") and (value.length is 0)))
 				missingValueError = new Error errorMessage
 				callback missingValueError, null
 			else

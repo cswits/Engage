@@ -6,13 +6,14 @@ ResponseHandlerFactory = require('../handlers/response-handler').ResponseHandler
 exports.LecturerController = class LecturerController
 	constructor: (io) ->
 		@lecturer = new Lecturer io
-		@responseHandler = ResponseHandler.getResponseHandlerInstance()
+		@responseHandler = ResponseHandlerFactory.getResponseHandlerInstance()
 
 	authenticateLecturer: (request, response) =>
 		console.log "Lecturer logging into the system..."
 
-		lecturerUsername = request.body.username
-		lecturerPassword = request.body.password
+		# Depending on the nature of the request the data might be in query or the body
+		lecturerUsername = request.query.username
+		lecturerPassword = request.query.password
 
 		@lecturer.authenticate lecturerUsername, lecturerPassword, (authenticationError, authenticationResult) =>
 			@responseHandler.handleResponse authenticationError, authenticationResult, request, response
@@ -20,12 +21,18 @@ exports.LecturerController = class LecturerController
 	createLecturer: (request, response) =>
 		console.log "Creating a new lecturer into the Engage database..."
 
-		username = request.body.username
-		password = request.body.password
-		lastname = request.body.lastname
-		firstname = request.body.firstname
-		title = request.body.title
+		# Depending on how the request is created the data might be in the query or the body
+		# username = request.body.username
+		# password = request.body.password
+		# lastname = request.body.lastname
+		# firstname = request.body.firstname
+		# title = request.body.title
 
+		username = request.query.username
+		password = request.query.password
+		lastname = request.query.lastname
+		firstname = request.query.firstname
+		title = request.query.title
 		@lecturer.create username, password, lastname, firstname, title, (createError, createResult) =>
 			@responseHandler.handleResponse createError, createResult, request, response
 
