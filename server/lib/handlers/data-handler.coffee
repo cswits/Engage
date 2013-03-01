@@ -108,45 +108,45 @@ exports.DataHandlerFactory = class DataHandlerFactory
                             result: "Success!"
                         callback null, leaveResult
 
-        # addUnderstandingLevel: (lectureCode, deviceId, understandingData, callback) =>
-        # 	lectureData = @understandingLevels[lectureCode]
-        # 	if not lectureData?
-        # 		wrongLectureCodeError = new Error "Lecture code #{lectureCode} unknown for understanding levels"
-        # 		callback wrongLectureCodeError, null
-        # 	else
-        # 		deviceData = lectureData[deviceId]
-        # 		if not deviceData?
-        # 			wrongDeviceIDError = new Error "Device ID #{deviceId} unknown for understanding levels"
-        # 			callback wrongDeviceIDError, null
-        # 		else
-        # 			deviceData.push understandingData
-        # 			understandingRecord = 
-        # 				lectureCode: lectureCode
-        # 				deviceId: deviceId
-        # 				timestamp: understandingData.getTimestamp()
-        # 				undertandingLevel: understandingData.getLevel()
-        # 			@saveData "understandings", understandingRecord, (error, result) =>
-        # 				if error?
-        # 					callback error, null
-        # 				else
-        # 					if not result?
-        # 						saveFailedError = new Error "Saving understanding level to database failed!"
-        # 						callback saveFailedError, null
-        # 					else
-        # 						addResult = 
-        # 							result: "Success!"
-        # 						lecturerUsername = @currentlyLecturing[lectureCode]
-        # 						if lecturerUsername?
-        # 							lecturerSocket = @socketMap[lecturerUsername]
-        # 							recentUnderstandings = []
-        # 							allUnderstandings = @understandingLevels[lectureCode]
-        # 							for currentDevice in allUnderstandings
-        # 								deviceUnderstandings = allUnderstandings[currentDevice]
-        # 								latestUnderstandingData = deviceUnderstandings[deviceUnderstandings.length - 1]
-        # 								currentLevel = latestUnderstandingData.getLevel()
-        # 								levelAsNumber = Number(currentLevel)
-        # 								recentUnderstandings.push levelAsNumber
-        # 							averageData = 
-        # 								averages: recentUnderstandings
-        # 							lecturerSocket.emit "averages", averageData
-        # 						callback null, addResult
+        addUnderstandingLevel: (lectureCode, deviceId, understandingData, callback) =>
+            lectureData = @understandingLevels[lectureCode]
+            if not lectureData?
+                wrongLectureCodeError = new Error "Lecture code #{lectureCode} unknown for understanding levels"
+                callback wrongLectureCodeError, null
+            else
+                deviceData = lectureData[deviceId]
+                if not deviceData?
+                    wrongDeviceIDError = new Error "Device ID #{deviceId} unknown for understanding levels"
+                    callback wrongDeviceIDError, null
+                else
+                    deviceData.push understandingData
+                    understandingRecord = 
+                        lectureCode: lectureCode
+                        deviceId: deviceId
+                        timestamp: understandingData.getTimestamp()
+                        undertandingLevel: understandingData.getLevel()
+                    @saveData "understandings", understandingRecord, (error, result) =>
+                        if error?
+                            callback error, null
+                        else
+                            if not result?
+                                saveFailedError = new Error "Saving understanding level to database failed!"
+                                callback saveFailedError, null
+                            else
+                                addResult = 
+                                    result: "Success!"
+                                lecturerUsername = @currentlyLecturing[lectureCode]
+                                if lecturerUsername?
+                                    lecturerSocket = @socketMap[lecturerUsername]
+                                    recentUnderstandings = []
+                                    allUnderstandings = @understandingLevels[lectureCode]
+                                    for currentDevice in allUnderstandings
+                                        deviceUnderstandings = allUnderstandings[currentDevice]
+                                        latestUnderstandingData = deviceUnderstandings[deviceUnderstandings.length - 1]
+                                        currentLevel = latestUnderstandingData.getLevel()
+                                        levelAsNumber = Number(currentLevel)
+                                        recentUnderstandings.push levelAsNumber
+                                    averageData = 
+                                        averages: recentUnderstandings
+                                    lecturerSocket.emit "averages", averageData
+                                callback null, addResult

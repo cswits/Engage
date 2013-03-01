@@ -8,5 +8,5 @@ module.exports = (app, io) =>
         app.get '/lecturers/create', (request, response) =>
                 new LecturerController(null).createLecturer request, response
 
-        app.get '/lectures/delete/username', (request, response) =>
+        app.get '/lecturers/delete/:username', (request, response) =>
                 new LecturerController(null).deleteLecturer request, response
