@@ -9,6 +9,53 @@ exports.Lecture = class Lecture
         @validator = ValidatorFactory.getValidatorInstance()
         @dataHandler = DataHandlerFactory.getDataHandlerInstance()
 
+    leaveLecture: (lectureCode, deviceId, callback) =>
+        validateForLeaveLecture =
+            lectureCode: (lectureCodePartialCallback) =>
+                @validateLectureCode lectureCode, (lectureCodeValidationError, validatedLectureCode) =>
+                    lectureCodePartialCallback lectureCodeValidationError, validatedLectureCode
+            deviceId: (deviceIdPartialCallback) =>
+                @validateDeviceId deviceId, (deviceIdValidationError, validatedDeviceId) =>
+                    deviceIdPartialCallback deviceIdValidationError, validatedDeviceId
+        async.parallel validateForLeaveLecture, (validationError, validationResult) =>
+            if validationError?
+                callback validationError, null
+            else
+                @dataHandler.unmapLectureCodeFromStudent validationResult, (unmapError, unmapResult) =>
+                    callback unmapError, unmapResult
+
+    endLecture: (lectureCode, callback) =>
+        @validateLectureCode lectureCode, (lectureCodeValidationError, validatedLectureCode) =>
+            if lectureCodeValidationError?
+                callback lectureCodeValidationError, null
+            else
+                @dataHandler.endLecture validatedLectureCode, (endLectureError, endLectureResult) =>
+                    callback endLectureError, endLectureResult
+
+    joinLecture: (lectureCode, deviceId, callback) =>
+        validateForLectureCode =
+            lectureCode: (lectureCodePartialCallback) =>
+                @validateLectureCode lectureCode, (lectureCodeValidationError, validatedLectureCode) =>
+                    if lectureCodeValidationError?
+                        lectureCodePartialCallback lectureCodeValidationError, null
+                    else
+                        lectureCodePartialCallback null, validatedLectureCode
+            deviceId: (deviceIdPartialCallback) =>
+                @validateDeviceId deviceId, (deviceIdValidationError, validatedDeviceId) =>
+                    if deviceIdValidationError?
+                        deviceIdPartialCallback deviceIdValidationError, null
+                    else
+                        deviceIdPartialCallback null, validatedDeviceId
+        async.parallel validateForLectureCode, (validationError, validationResult) =>
+            if validationError?
+                callback validationError, null
+            else
+                @dataHandler.mapLectureCodeToStudent validationResult, (mappingError, mappingResult) =>
+                    if mappingError?
+                        callback mappingError, null
+                    else
+                        callback null, mappingResult                  
+
     getNewLectureCode: (courseCode, lecturerUsername, callback) =>
         validateForLectureCode =
             courseCode: (courseCodePartialCallback) =>
@@ -42,11 +89,16 @@ exports.Lecture = class Lecture
 
     validateCourseCode: (courseCode, callback) =>
         @simpleValidation courseCode, "Course code missing!", (courseCodeValidationError, validatedCourseCode) =>
-            if courseCodeValidationError?
-                callback courseCodeValidationError, null
-            else
-                callback null, validatedCourseCode
+            callback courseCodeValidationError, validatedCourseCode
 
     validateUsername: (username, callback) =>
         @simpleValidation username, "Username missing!", (usernameValidationError, validatedUsername) =>
             callback usernameValidationError, validatedUsername
+
+    validateLectureCode: (lectureCode, callback) =>
+        @simpleValidation lectureCode, "Lecture code missing!", (lectureCodeValidationError, validatedLectureCode) =>
+            callback lectureCodeValidationError, validatedLectureCode
+
+    validateDeviceId: (deviceId, callback) =>
+        @simpleValidation deviceId, "Device Id missing!", (deviceIdValidationError, validatedDeviceId) =>
+            callback deviceIdValidationError, validatedDeviceId

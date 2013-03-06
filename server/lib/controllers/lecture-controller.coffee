@@ -14,15 +14,14 @@ exports.LectureController = class LectureController
 		courseCode = request.query.courseCode
 		lecturerUsername = request.query.username
 		
-
 		@lecture.getNewLectureCode courseCode, lecturerUsername, (newCourseCodeError, newCourseCodeResult) =>
 			@responseHandler.handleResponse newCourseCodeError, newCourseCodeResult, request, response
 
 	joinLecture: (request, response) =>
 		console.log "Student joining a lecture..."
 
-		lectureCode = request.body.lectureCode
-		deviceId = request.body.deviceId
+		lectureCode = request.query.lectureCode
+		deviceId = request.query.deviceId
 
 		@lecture.joinLecture lectureCode, deviceId, (joinLectureError, joinLectureResult) =>
 			@responseHandler.handleResponse joinLectureError, joinLectureResult, request, response
@@ -30,15 +29,15 @@ exports.LectureController = class LectureController
 	endLecture: (request, response) =>
 		console.log "Lecturer ending a lecture..."
 
-		lectureCode = request.body.lectureCode
+		lectureCode = request.query.lectureCode
 		@lecture.endLecture lectureCode, (endLectureError, endLectureResult) =>
 			@responseHandler.handleResponse endLectureError, endLectureResult, request, response
 
 	leaveLecture: (request, response) =>
 		console.log "Student leaving a lecture ..."
 
-		lectureCode = request.body.lectureCode
-		deviceId = request.body.deviceId
+		lectureCode = request.query.lectureCode
+		deviceId = request.query.deviceId
 
 		@lecture.leaveLecture lectureCode, deviceId, (leaveLectureError, leaveLectureResult) =>
 			@responseHandler.handleResponse leaveLectureError, leaveLectureResult, request, response

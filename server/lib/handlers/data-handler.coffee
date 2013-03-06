@@ -11,7 +11,7 @@ exports.DataHandlerFactory = class DataHandlerFactory
         constructor: (@port, @host) ->
             @db = mongo.connect "localhost/engageDB", ["lecturers", "understandings"]
             @usedLectureCodes = {}
-            @currentLectureCodes = {}
+            @currentLectureCodes = []
             @currentDeviceIds = {}
             @understandingLevels = {}
             @socketMap = {}
@@ -52,8 +52,8 @@ exports.DataHandlerFactory = class DataHandlerFactory
                 callback deleteError, deleteResult
 
         generateNewLectureCode: (lectureCodeDetails, callback) =>
-            courseCode = lectureCodeDetails[courseCode]
-            username = lectureCodeDetails[username]
+            courseCode = lectureCodeDetails.courseCode
+            username = lectureCodeDetails.username
             lectureCode = ""
             while lectureCode.length < 8
                 lectureCode = Math.random().toString(36).substr(2)
@@ -62,53 +62,67 @@ exports.DataHandlerFactory = class DataHandlerFactory
                 if not existingUsedLectureCodes?
                     @usedLectureCodes[courseCode] = [lectureCode]
                     break
+                else if existingUsedLectureCodes.indexOf(lectureCode) is -1
+                    existingUsedLectureCodes.push lectureCode
+                    @usedLectureCodes[courseCode] = existingUsedLectureCodes
+                    break
                 else
                     lectureCode = ""
             @currentlyLecturing[lectureCode] = username
+            @currentLectureCodes.push lectureCode
             lectureCodeResult =
                 lectureCode: lectureCode
             callback null, lectureCodeResult
         
-        mapLectureCodeToStudent: (lectureCode, deviceId, callback) =>
-            if @currentLectureCodes.indexOf(lectureCode) is -1
+        mapLectureCodeToStudent: (mappingDetails, callback) =>
+            if @currentLectureCodes.indexOf(mappingDetails.lectureCode) is -1
                 wrongLectureCodeError = new Error "Lecture code does not exist"
                 callback wrongLectureCodeError, null
             else
-                @currentDeviceIds[lectureCode].push deviceId
+                myCurrentDevices = @currentDeviceIds[mappingDetails.lectureCode]
+                if not myCurrentDevices?
+                    myCurrentDevices = [mappingDetails.deviceId]
+                else
+                    # should check if the device belongs already
+                    if myCurrentDevices.indexOf(mappingDetails.deviceId) is -1
+                        myCurrentDevices.push mappingDetails.deviceId
+                @currentDeviceIds[mappingDetails.lectureCode] = myCurrentDevices
                 currentTS = new Date().toTimeString()
                 result =
-                    lectureCode: lectureCode
+                    lectureCode: mappingDetails.lectureCode
                     time: currentTS
                 callback null, result
 
         endLecture: (lectureCode, callback) =>
-            if @currentLectureCodes.indexOf(lectureCode) is -1
+            lectureCodeIndex = @currentLectureCodes.indexOf lectureCode
+            if lectureCodeIndex is -1
                 wrongLectureCodeError = new Error "Lecture code does not exist"
                 callback wrongLectureCodeError, null
             else
-                @currentLectureCodes = {}
+                @currentLectureCodes.splice lectureCodeIndex, 1
                 delete @currentDeviceIds[lectureCode]
+                delete @currentlyLecturing[lectureCode]
                 endLectureResult =
                     result: "Success!"
                 callback null, endLectureResult
 
-        unmapLectureCodeFromStudent: (lectureCode, deviceId, callback) =>
-            allLectureDevices = @currentDeviceIds[lectureCode]
+        unmapLectureCodeFromStudent: (unmapDetails, callback) =>
+            allLectureDevices = @currentDeviceIds[unmapDetails.lectureCode]
             if not allLectureDevices?
                 unknownLectureCodeError = new Error "Lecture code unknown!"
                 callback unknownLectureCodeError, null
             else
-                deviceIndex = allLectureDevices.indexOf deviceId
+                deviceIndex = allLectureDevices.indexOf unmapDetails.deviceId
                 if deviceIndex is -1
                     unknownDeviceError = new Error "Device unknown!"
                     callback unknownDeviceError, null
                 else
                     allLectureDevices.splice deviceIndex, 1
                     if allLectureDevices.length is 0
-                        delete @currentDeviceIds[lectureCode]
-                        leaveResult =
-                            result: "Success!"
-                        callback null, leaveResult
+                        delete @currentDeviceIds[unmapDetails.lectureCode]
+                    leaveResult =
+                        result: "Success!"
+                    callback null, leaveResult
 
         addUnderstandingLevel: (lectureCode, deviceId, understandingData, callback) =>
             lectureData = @understandingLevels[lectureCode]
