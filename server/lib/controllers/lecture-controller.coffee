@@ -45,9 +45,9 @@ exports.LectureController = class LectureController
 	submitUnderstandingLevel: (request, response) =>
 		console.log "Student submitting their current level of understanding..."
 
-		lectureCode = request.body.lectureCode
-		deviceId = request.body.deviceId
-		understandingLevel = request.body.understandingLevel
+		lectureCode = request.query.lectureCode
+		deviceId = request.query.deviceId
+		understandingLevel = request.query.understandingLevel
 
 		@lecture.submitUnderstandingLevel lectureCode, deviceId, understandingLevel, (understandingError, understandingResult) =>
 			@handleResponse.handleResponse understandingError, understandingResult, request, response

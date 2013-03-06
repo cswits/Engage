@@ -1,6 +1,6 @@
 # lecture.coffee
 
-async = require('async')
+async = require 'async'
 ValidatorFactory = require('../handlers/validator').ValidatorFactory
 DataHandlerFactory = require('../handlers/data-handler').DataHandlerFactory
 
@@ -8,6 +8,26 @@ exports.Lecture = class Lecture
     constructor: () ->
         @validator = ValidatorFactory.getValidatorInstance()
         @dataHandler = DataHandlerFactory.getDataHandlerInstance()
+
+    submitUnderstandingLevel: (lectureCode, deviceId, understandingLevel, callback) =>
+        validateForUnderstanding =
+            lectureCode: (lectureCodePartialCallback) =>
+                @validateLectureCode lectureCode, (lectureCodeValidationError, validatedLectureCode) =>
+                    lectureCodePartialCallback lectureCodeValidationError, validatedLectureCode
+            deviceId: (deviceIdPartialCallback) =>
+                @validateDeviceId deviceId, (deviceIdValidationError, validatedDeviceId) =>
+                    deviceIdPartialCallback deviceIdValidationError, validatedDeviceId
+            understandingLevel: (understandingLevelPartialCallback) =>
+                @validateUnderstandingLevel understandingLevel, (understandingLevelValidationError, validatedUnderstandingLevel) =>
+                    understandingLevelPartialCallback understandingLevelValidationError, validatedUnderstandingLevel
+        async.parallel validateForUnderstanding, (validationError, validationResult) =>
+            if validationError?
+                callback validationError, null
+            else
+                now = new Date().toTimeString()
+                understandingData = new UnderstandingData validationResult.understandingLevel, now
+                @dataHandler.addUnderstandingLevel validationResult, now, (addUnderstandingLevelError, addUnderstandingLevelResult) =>
+                    callback addUnderstandingLevelError, addUnderstandingLevelResult
 
     leaveLecture: (lectureCode, deviceId, callback) =>
         validateForLeaveLecture =
@@ -90,6 +110,10 @@ exports.Lecture = class Lecture
     validateCourseCode: (courseCode, callback) =>
         @simpleValidation courseCode, "Course code missing!", (courseCodeValidationError, validatedCourseCode) =>
             callback courseCodeValidationError, validatedCourseCode
+
+    validateUnderstandingLevel: (understandingLevel, callback) =>
+        @simpleValidation understandingLevel, "Understanding level missing!", (understandingLevelValidationError, validatedUnderstandingLevel) =>
+            callback understandingLevelValidationError, validatedUnderstandingLevel
 
     validateUsername: (username, callback) =>
         @simpleValidation username, "Username missing!", (usernameValidationError, validatedUsername) =>

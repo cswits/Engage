@@ -1,6 +1,7 @@
 # data-handler.coffee
 
 mongo = require 'mongojs'
+async = require 'async'
 
 exports.DataHandlerFactory = class DataHandlerFactory
 	_dataHandlerInstance = undefined
@@ -50,6 +51,10 @@ exports.DataHandlerFactory = class DataHandlerFactory
         deleteData: (bucketName, criteria, callback) =>
             @db[bucketName].remove criteria, (deleteError, deleteResult) =>
                 callback deleteError, deleteResult
+
+        updateData: (bucketName, criteria, newValue, callback) =>
+            @db[bucketName].update criteria, newValue, (updateError, updateResult) =>
+                callback updateError, updateResult
 
         generateNewLectureCode: (lectureCodeDetails, callback) =>
             courseCode = lectureCodeDetails.courseCode
@@ -124,45 +129,137 @@ exports.DataHandlerFactory = class DataHandlerFactory
                         result: "Success!"
                     callback null, leaveResult
 
-        addUnderstandingLevel: (lectureCode, deviceId, understandingData, callback) =>
-            lectureData = @understandingLevels[lectureCode]
+        addUnderstandingLevel: (understandingDetails, understandingData, callback) =>
+            saveUnderstandingDetails =
+                saveLocal: (saveLocalPartialCallback) =>
+                    @saveUnderstandingLevelLocal understandingDetails, understandingData, (saveLocalError, saveLocalResult) =>
+                        saveLocalPartialCallback saveLocalError, saveLocalResult
+                saveDB: (saveDBPartialCallback) =>
+                    @saveUnderstandingLevelDB understandingDetails, (saveDBError, saveDBResult) =>
+                        saveDBPartialCallback saveDBError, saveDBResult
+            async.parallel saveUnderstandingDetails, (saveError, saveResult) =>
+                if saveError?
+                    callback saveError, null
+                else
+                    addResult =
+                        result: "Success!"
+                    lecturerUsername = @currentlyLecturing[understandingDetails.lectureCode]
+                    if lecturerUsername?
+                        # send the new average in socketmap
+                        lecturerSocket = @socketMap[lecturerUsername]
+                        recentUnderstandings = []
+                        allUnderstandings = @understandingLevels[understandingDetails.lectureCode]
+                        for currentDevice in allUnderstandings
+                            deviceUnderstandings = allUnderstandings[currentDevice]
+                            latestUnderstandingData = deviceUnderstandings[deviceUnderstandings.length - 1]
+                            currentLevel = latestUnderstandingData.getLevel()
+                            levelAsNumber = Number(currentLevel)
+                            recentUnderstandings.push levelAsNumber
+                    callback null, addResult
+        
+        saveUnderstandingLevelLocal: (understandingObj, understandingData, callback) =>
+            lectureData = @understandingLevels[understandingObj.lectureCode]
             if not lectureData?
-                wrongLectureCodeError = new Error "Lecture code #{lectureCode} unknown for understanding levels"
+                wrongLectureCodeError = new Error "Lecture code #{understandingObj.lectureCode} unknown in understanding levels"
                 callback wrongLectureCodeError, null
             else
-                deviceData = lectureData[deviceId]
+                deviceData = lectureData[understandingObj.deviceId]
                 if not deviceData?
-                    wrongDeviceIDError = new Error "Device ID #{deviceId} unknown for understanding levels"
-                    callback wrongDeviceIDError, null
+                    wrongDeviceIdError = new Error "Device Id #{understandingObj.deviceId} unknown in understanding levels"
+                    callback wrongDeviceIdError, null
                 else
                     deviceData.push understandingData
-                    understandingRecord = 
-                        lectureCode: lectureCode
-                        deviceId: deviceId
-                        timestamp: understandingData.getTimestamp()
-                        undertandingLevel: understandingData.getLevel()
-                    @saveData "understandings", understandingRecord, (error, result) =>
-                        if error?
-                            callback error, null
+                    lectureData[understandingObj.deviceId] = deviceData
+                    @understandingLevels[understandingObj.lectureCode]
+                    callback null, true
+
+        saveUnderstandingLevelDB: (understandingObj, understandingData, callback) =>
+            currentLectureCode = understandingObj.lectureCode
+            currentDeviceId = understandingObj.deviceId
+            currentCourseCode = undefined
+            # look for the course code
+            for courseCode, lectureCode of @usedLectureCodes
+                if lectureCode is currentLectureCode
+                    currentCourseCode = courseCode
+                    break
+            if not currentCourseCode?
+                unknownCourseCodeError = new Error "Unknown course code"
+                callback unknownCourseCodeError, null
+            else
+                courseCodeCriteria =
+                    courseCode: currentCourseCode
+                @findData "understandings", courseCodeCriteria, (findCourseCodeError, findCourseCodeResult) =>
+                    if findCourseCodeError?
+                        callback findCourseCodeError, null
+                    else
+                        if not findCourseCodeResult?
+                            # should add a new one and save
+                            brandNewUnderstanding =
+                                deviceId: currentDeviceId
+                                timestamp: understandingData.getTimestamp()
+                                level: understandingData.getLevel()
+                            brandNewSession =
+                                lectureCode: currentLectureCode
+                                understandings: [brandNewUnderstanding]
+                            brandNewCourseCode =
+                                courseCode: currentCourseCode
+                                allLectures: [brandNewSession]
+                            @saveData "understandings", brandNewCourseCode, (newDataError, newDataResult) =>
+                                if not newDataError?
+                                    callback newDataError, null
+                                else
+                                    if not newDataResult?
+                                        saveUnderstandingError = new Error "Error saving new understanding to DB"
+                                        callback saveUnderstandingError, null
+                                    else
+                                        callback null, true
+                        else if findCourseCodeResult.length > 1
+                            tooManyCourseCodeError = new Error "There are too many entries in the DB for course code #{currentCourseCode}"
+                            callback tooManyCourseCodeError, null
                         else
-                            if not result?
-                                saveFailedError = new Error "Saving understanding level to database failed!"
-                                callback saveFailedError, null
+                            currentEntry = findCourseCodeResult[0]
+                            allLectures = currentEntry.allLectures
+                            targetedSession = undefined
+                            targetedSessionIndex = undefined
+                            for curIndex, curLecture in allLectures
+                                if curLecture.lectureCode is currentLectureCode
+                                    targetedSession = curLecture
+                                    targetedSessionIndex = curIndex
+                                    break
+                            if not targetedSession?
+                                # should create a new session and save it in the db
+                                myNewUnderstanding =
+                                    deviceId: currentDeviceId
+                                    timestamp: understandingData.getTimestamp()
+                                    level: understandingData.getLevel()
+                                myNewLectureData =
+                                    lectureCode: currentLectureCode
+                                    understandings: [myNewUnderstanding]
+                                allLectures.push myNewLectureData
+                                myNewCourseData =
+                                    courseCode: currentCourseCode
+                                    allLectures: allLectures
+                                @updateData "understandings", myNewCourseData, {multi: false}, (updateError0) =>
+                                    if updateError0?
+                                        callback updateError0, null
+                                    else
+                                        callback null, true
                             else
-                                addResult = 
-                                    result: "Success!"
-                                lecturerUsername = @currentlyLecturing[lectureCode]
-                                if lecturerUsername?
-                                    lecturerSocket = @socketMap[lecturerUsername]
-                                    recentUnderstandings = []
-                                    allUnderstandings = @understandingLevels[lectureCode]
-                                    for currentDevice in allUnderstandings
-                                        deviceUnderstandings = allUnderstandings[currentDevice]
-                                        latestUnderstandingData = deviceUnderstandings[deviceUnderstandings.length - 1]
-                                        currentLevel = latestUnderstandingData.getLevel()
-                                        levelAsNumber = Number(currentLevel)
-                                        recentUnderstandings.push levelAsNumber
-                                    averageData = 
-                                        averages: recentUnderstandings
-                                    lecturerSocket.emit "averages", averageData
-                                callback null, addResult
+                                curUnderstandings = targetedSession.understandings
+                                newUndersandingData =
+                                    deviceId: currentDeviceId
+                                    timestamp: understandingData.getTimestamp()
+                                    level: understandingData.getLevel()
+                                curUnderstandings.push newUndersandingData
+                                revisedSessionData =
+                                    lectureCode: currentLectureCode
+                                    understandings: curUnderstandings
+                                allLectures[targetedSessionIndex] = revisedSessionData
+                                revisedCourseCodeObj =
+                                    courseCode: currentCourseCode
+                                    allLectures: allLectures
+                                @updateData "understandings", revisedCourseCodeObj, {multi: false}, (updateError) =>
+                                    if updateError?
+                                        callback updateError, null
+                                    else
+                                        callback null, true
