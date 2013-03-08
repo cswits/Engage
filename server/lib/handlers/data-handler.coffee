@@ -52,8 +52,8 @@ exports.DataHandlerFactory = class DataHandlerFactory
             @db[bucketName].remove criteria, (deleteError, deleteResult) =>
                 callback deleteError, deleteResult
 
-        updateData: (bucketName, criteria, newValue, callback) =>
-            @db[bucketName].update criteria, newValue, (updateError, updateResult) =>
+        updateData: (bucketName, criteria, setValue, callback) =>
+            @db[bucketName].update criteria, {$set: setValue}, (updateError, updateResult) =>
                 callback updateError, updateResult
 
         generateNewLectureCode: (lectureCodeDetails, callback) =>
@@ -156,7 +156,7 @@ exports.DataHandlerFactory = class DataHandlerFactory
                             levelAsNumber = Number(currentLevel)
                             recentUnderstandings.push levelAsNumber
                     callback null, addResult
-        
+
         saveUnderstandingLevelLocal: (understandingObj, understandingData, callback) =>
             lectureData = @understandingLevels[understandingObj.lectureCode]
             if not lectureData?
@@ -236,14 +236,19 @@ exports.DataHandlerFactory = class DataHandlerFactory
                                     lectureCode: currentLectureCode
                                     understandings: [myNewUnderstanding]
                                 allLectures.push myNewLectureData
-                                myNewCourseData =
+                                myNewCourseDataCriteria =
                                     courseCode: currentCourseCode
+                                myNewCourseData =
                                     allLectures: allLectures
-                                @updateData "understandings", myNewCourseData, {multi: false}, (updateError0) =>
+                                @updateData "understandings", myNewCourseDataCriteria, myNewCourseData, (updateError0, updated) =>
                                     if updateError0?
                                         callback updateError0, null
                                     else
-                                        callback null, true
+                                        if not updated?
+                                            updateFailedError = new Error "Update failed!"
+                                            callback updateFailedError, null
+                                        else
+                                            callback null, true
                             else
                                 curUnderstandings = targetedSession.understandings
                                 newUndersandingData =
@@ -255,11 +260,16 @@ exports.DataHandlerFactory = class DataHandlerFactory
                                     lectureCode: currentLectureCode
                                     understandings: curUnderstandings
                                 allLectures[targetedSessionIndex] = revisedSessionData
-                                revisedCourseCodeObj =
+                                revisedCourseCodeCriteria =
                                     courseCode: currentCourseCode
+                                revisedCourseCodeObj =
                                     allLectures: allLectures
-                                @updateData "understandings", revisedCourseCodeObj, {multi: false}, (updateError) =>
+                                @updateData "understandings", revisedCourseCodeCriteria, revisedCourseCodeObj, (updateError, updated1) =>
                                     if updateError?
                                         callback updateError, null
                                     else
-                                        callback null, true
+                                        if not updated1?
+                                            updateFailedError1 = new Error "Update failed!"
+                                            callback updateFailedError1, null
+                                        else
+                                            callback null, true
