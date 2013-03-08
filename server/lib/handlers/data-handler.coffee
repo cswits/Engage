@@ -75,6 +75,7 @@ exports.DataHandlerFactory = class DataHandlerFactory
                     lectureCode = ""
             @currentlyLecturing[lectureCode] = username
             @currentLectureCodes.push lectureCode
+            @understandingLevels[lectureCode] = {}
             lectureCodeResult =
                 lectureCode: lectureCode
             callback null, lectureCodeResult
@@ -93,10 +94,17 @@ exports.DataHandlerFactory = class DataHandlerFactory
                         myCurrentDevices.push mappingDetails.deviceId
                 @currentDeviceIds[mappingDetails.lectureCode] = myCurrentDevices
                 currentTS = new Date().toTimeString()
-                result =
-                    lectureCode: mappingDetails.lectureCode
-                    time: currentTS
-                callback null, result
+                lectureData = @understandingLevels[mappingDetails.lectureCode]
+                if not lectureData?
+                    unknownLectureCodeError = new Error "Lecture code #{mappingDetails.lectureCode} unknown in understanding levels"
+                    callback unknownLectureCodeError, null
+                else
+                    lectureData[mappingDetails.deviceId] = []
+                    @understandingLevels[mappingDetails.lectureCode] = lectureData
+                    result =
+                        lectureCode: mappingDetails.lectureCode
+                        time: currentTS
+                    callback null, result
 
         endLecture: (lectureCode, callback) =>
             lectureCodeIndex = @currentLectureCodes.indexOf lectureCode
@@ -107,6 +115,7 @@ exports.DataHandlerFactory = class DataHandlerFactory
                 @currentLectureCodes.splice lectureCodeIndex, 1
                 delete @currentDeviceIds[lectureCode]
                 delete @currentlyLecturing[lectureCode]
+                delete @understandingLevels[lectureCode]
                 endLectureResult =
                     result: "Success!"
                 callback null, endLectureResult
@@ -125,6 +134,9 @@ exports.DataHandlerFactory = class DataHandlerFactory
                     allLectureDevices.splice deviceIndex, 1
                     if allLectureDevices.length is 0
                         delete @currentDeviceIds[unmapDetails.lectureCode]
+                    lectureData = @understandingLevels[unmapDetails.lectureCode]
+                    delete lectureData[unmapDetails.deviceId]
+                    @understandingLevels[unmapDetails.lectureCode] = lectureData
                     leaveResult =
                         result: "Success!"
                     callback null, leaveResult
@@ -135,7 +147,7 @@ exports.DataHandlerFactory = class DataHandlerFactory
                     @saveUnderstandingLevelLocal understandingDetails, understandingData, (saveLocalError, saveLocalResult) =>
                         saveLocalPartialCallback saveLocalError, saveLocalResult
                 saveDB: (saveDBPartialCallback) =>
-                    @saveUnderstandingLevelDB understandingDetails, (saveDBError, saveDBResult) =>
+                    @saveUnderstandingLevelDB understandingDetails, understandingData, (saveDBError, saveDBResult) =>
                         saveDBPartialCallback saveDBError, saveDBResult
             async.parallel saveUnderstandingDetails, (saveError, saveResult) =>
                 if saveError?
@@ -179,7 +191,7 @@ exports.DataHandlerFactory = class DataHandlerFactory
             currentCourseCode = undefined
             # look for the course code
             for courseCode, lectureCode of @usedLectureCodes
-                if lectureCode is currentLectureCode
+                if lectureCode.toString() is currentLectureCode.toString()
                     currentCourseCode = courseCode
                     break
             if not currentCourseCode?
@@ -192,7 +204,7 @@ exports.DataHandlerFactory = class DataHandlerFactory
                     if findCourseCodeError?
                         callback findCourseCodeError, null
                     else
-                        if not findCourseCodeResult?
+                        if (not findCourseCodeResult?) or (findCourseCodeResult.length is 0)
                             # should add a new one and save
                             brandNewUnderstanding =
                                 deviceId: currentDeviceId

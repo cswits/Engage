@@ -3,6 +3,7 @@
 async = require 'async'
 ValidatorFactory = require('../handlers/validator').ValidatorFactory
 DataHandlerFactory = require('../handlers/data-handler').DataHandlerFactory
+UnderstandingData = require('../handlers/understanding-data').UnderstandingData
 
 exports.Lecture = class Lecture
     constructor: () ->
@@ -26,7 +27,7 @@ exports.Lecture = class Lecture
             else
                 now = new Date().toTimeString()
                 understandingData = new UnderstandingData validationResult.understandingLevel, now
-                @dataHandler.addUnderstandingLevel validationResult, now, (addUnderstandingLevelError, addUnderstandingLevelResult) =>
+                @dataHandler.addUnderstandingLevel validationResult, understandingData, (addUnderstandingLevelError, addUnderstandingLevelResult) =>
                     callback addUnderstandingLevelError, addUnderstandingLevelResult
 
     leaveLecture: (lectureCode, deviceId, callback) =>

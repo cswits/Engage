@@ -50,4 +50,4 @@ exports.LectureController = class LectureController
 		understandingLevel = request.query.understandingLevel
 
 		@lecture.submitUnderstandingLevel lectureCode, deviceId, understandingLevel, (understandingError, understandingResult) =>
-			@handleResponse.handleResponse understandingError, understandingResult, request, response
+			@responseHandler.handleResponse understandingError, understandingResult, request, response
