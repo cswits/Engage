@@ -28,93 +28,91 @@
         <link rel="stylesheet" href="css/jquery.mobile.structure-1.2.0.min.css" />
         <link rel="stylesheet" href="css/jquery.mobile.theme-1.2.0.min.css" />
         <link href="css/verticalSlider.css" rel="stylesheet" type="text/css" />
-        
+	<script type="text/javascript" src="cordova-2.3.0.js"></script>
+	<script src="js/index.js"></script>
         <script src="js/jquery-1.8.2.js"></script>
         <script src="js/jquery.mobile-1.2.0.min.js"></script>
+	<script language="javascript" type="text/javascript" src="js/jquery.jqplot.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/jquery.jqplot.min.css" />
         <script src="js/verticalSlider.js"></script>
-        <title>Hello World</title>
+	<script src="js/student.js"></script>
+	<script src="js/lecturer.js"></script>
+        <title>Engage</title>
 
 
         <script>
-            $( document ).ready( function() {
-                $.mobile.changePage( "#student_feedback", { transition: "slideup"} );
-                
-                $('[data-role=header],[data-role=footer]').fixedtoolbar({ tapToggle:false });
-                $("#eContent_student_bulb_on").css("width",$(window).width());
-                $("#eContent_student_bulb_off").css("width",$(window).width());
+	app.initialize();
+	
+	$( document ).delegate("#student_feedback_page", "pageinit", function() {
+  		student_feedback_init();
+	});
+	$( document ).delegate("#login_page", "pageinit", function() {
+  		login_init();
+	});
+	$( document ).delegate("#student_feedback_page", "pageinit", function() {
+  		lecturer_newlecture_init();
+	});
+	$( document ).delegate("#lecturer_watchlecture_page", "pageinit", function() {
+  		lecturer_watchlecture_init();
+	});
+	$( document ).delegate("#lecturer_newlecture_page", "pageinit", function() {
+  		lecturer_newlecture_init();
+	});
+	$( document ).delegate("#student_codeentry_page", "pageinit", function() {
+  		student_codeentry_init();
+	});
 
-                $(window).bind('resize',function(){
-                    var w = $(window).width();
-                    var h = $(window).height()-80;
-                    var h_head = $("eHeader2").height();
 
-                    var bulb_width = w-40;
-                    if (bulb_width*1.78 > h){
-                        bulb_width = h/1.8;
-                    }
-                    $("#eContent_student_bulb_on").css("width",bulb_width);
-                    $("#eContent_student_bulb_off").css("width",bulb_width);
-                    $(".ui-slider-vertical").css("height",0.9*(h-2*h_head));
-                    $(".ui-slider-verticalInverted").css("height",0.8*$("#eContent_student_bulb_off").height()-40);
-                }).trigger('resize');
-                
-                $("#slider").change(function(){
-                    var slider_value = $(this).val();
-                    $("#eContent_student_bulb_on").css("opacity", slider_value/100);
-                });
-            });
+	$(document).ready(function() {
+		$("#student_codeentry_page").load("student_codeentry.html");
+		$("#student_feedback_page").load("student_feedback.html");
+		$("#lecturer_newlecture_page").load("lecturer_newlecture.html");
+		$("#lecturer_watchlecture_page").load("lecturer_watchlecture.html");
+		$("#login_page").load("login.html");
+	});
+
+	function switchpage(pageName){
+		$.mobile.changePage(pagename);
+	}
         </script>
 
 
     </head>
     <body>
-        <!-- -------------------------------- LOGIN PAGE---------------------------------------- -->
-        <div data-role="page" class="ePage" id="login">
-            <div id="eHeader" data-theme="a" data-role="header" data-position="fixed">
+        <div data-role="page" class="ePage" id="role_selector_page">
+ <div id="eHeader2" data-theme="a" data-role="header" data-position="fixed">
                 <h3>
                     Header
                 </h3>
-        </div>
+            </div>
+    <div data-role="content">
+        <a data-role="button" data-theme="b" href="#login_page">
+            Lecturer
+        </a>
+        <a data-role="button" data-theme="b" href="#student_codeentry_page">
+            Student
+        </a>
     </div>
-    
-        <!-- ----------------------------  Student Feedback ----------------------------- -->
-        <div data-role="page" class="ePage" id="student_feedback">
-            <div id="eHeader2" data-theme="a" data-role="header" data-position="fixed">
-                <h3>
-                    Header
-                </h3>
-            </div>
-            <div id="eContent" data-role="content">
-                <div id="fader">
-                    <img id="eContent_student_bulb_off" src="img/base.png" style="position:absolute;top:20;left:0;" />
-                    <img id="eContent_student_bulb_on" src="img/bright.png" style="position:absolute;top:20;left:0;" />
-                </div>
-                <input id="slider" name="slider" type="range" min="0" max="100" value="25" step="5" sliderOrientation="verticalInverted" style="display:none;" />
-            </div>
-
-            <div id="eFooter" data-theme="a" data-role="footer" data-position="fixed">
+<div id="eFooter" data-theme="a" data-role="footer" data-position="fixed">
                 <h3>
                     Footer
                 </h3>
             </div>
+	</div>
+
+        <div data-role="page" class="ePage" id="login_page">
+    	</div>
+    
+        <div data-role="page" class="ePage" id="student_feedback_page">
+	</div>
+
+        <div data-role="page" class="ePage" id="student_codeentry_page">
+	</div>
+
+        <div data-role="page" class="ePage" id="lecturer_newlecture_page">
         </div>
         
-        <!-- -------------------------------- New Lecture PAGE---------------------------------------- -->
-        <div data-role="page" class="ePage" id="new_lecture">
-            <div id="eHeader" data-theme="a" data-role="header" data-position="fixed">
-                <h3>
-                    Header
-                </h3>
-            </div>
-        </div>
-        
-        <!-- -------------------------------- Watch Lecture PAGE---------------------------------------- -->
-        <div data-role="page" class="ePage" id="watch_lecture">
-            <div id="eHeader" data-theme="a" data-role="header" data-position="fixed">
-                <h3>
-                    Header
-                </h3>
-            </div>        
+        <div data-role="page" class="ePage" id="lecturer_watchlecture_page">
         </div>
 
 

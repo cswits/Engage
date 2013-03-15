@@ -1,7 +1,26 @@
-            <div id="eContent" data-role="content">
-                <div id="fader">
-                    <img id="eContent_student_bulb_off" src="img/base.png" style="position:absolute;top:0;left:0;" />
-                    <img id="eContent_student_bulb_on" src="img/bright.png" style="position:absolute;top:0;left:0;" />
-                </div>
-                <input id="slider" name="slider" type="range" min="0" max="100" value="25" step="5" sliderOrientation="verticalInverted" />
+
+            <div id="eHeader2" data-theme="a" data-role="header" data-position="fixed">
+                <h3>
+                    Header
+                </h3>
             </div>
+
+            <div id="student_feedback_content" data-role="content">
+                <div id="fader">
+                    <img id="eContent_student_bulb_off" src="img/base.png" style="position:relative;top:20;left:0;" />
+                    <img id="eContent_student_bulb_on" src="img/bright.png" style="position:absolute;top:20;left:0;" />
+                </div>
+                <input id="slider" name="slider" type="range" min="0" max="100" value="25" step="5" sliderOrientation="verticalInverted" style="display:none;" />
+        <a data-role="button" data-theme="b" href="#role_selector_page" data-icon="arrow-l"
+        data-iconpos="right">
+            Stop
+        </a>
+
+            </div>
+
+            <div id="eFooter" data-theme="a" data-role="footer" data-position="fixed">
+                <h3>
+                    Footer
+                </h3>
+            </div>
+
