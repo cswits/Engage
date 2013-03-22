@@ -1,7 +1,7 @@
 # lecturer-controller.coffee
 
-Lecturer = require('../models/lecturer').Lecturer;
-ResponseHandlerFactory = require('../handlers/response-handler').ResponseHandlerFactory;
+Lecturer = require('../models/lecturer').Lecturer
+ResponseHandlerFactory = require('../handlers/response-handler').ResponseHandlerFactory
 
 exports.LecturerController = class LecturerController
 	constructor: (io) ->
