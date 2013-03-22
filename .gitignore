@@ -1,1 +1,2 @@
 client/bin/*
+server/node_modules/bcrypt

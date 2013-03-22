@@ -42,4 +42,13 @@ If you are on Mac OS X and using homebrew as your package manager, the following
 If you do not own /usr/local, you should use sudo. You can own /usr/local using the chown command
 You should also install npm, the node.js package manager.
 
+#Developer Corner
+Once you pull or fetch a new version of the repository from the github account, do not forget to reinstall your modules as follows:
+<pre><code>
+	cd server
+	npm install -d	
+</code></pre>
+
+This will install all the dependency modules that are still missing
+
 Enjoy!

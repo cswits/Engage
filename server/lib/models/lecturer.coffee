@@ -58,7 +58,7 @@ exports.Lecturer = class Lecturer
 								singleLecturer = lecturers[0]
 								hashedPassword = singleLecturer.password
 								bcrypt.compare validationResult.password, hashedPassword, (compareError, compareResult) =>
-									if compareError?
+									if compareError
 										callback compareError, null
 									else
 										if not compareResult?
