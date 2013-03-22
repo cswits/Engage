@@ -1,5 +1,8 @@
 # configuration-controller.coffee
 
+# a version number must be added to the lecturer login and the student join lecture.
+# if that version is not greater or equal to the oldest version in the db, the request is rejected
+
 Configuration = require('../models/configuration').Configuration
 ResponseHandlerFactory = require('../handlers/response-handler').ResponseHandlerFactory
 
